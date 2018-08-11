@@ -1,0 +1,28 @@
+#include "stdafx.h"
+DWORD Offsets::bClient;
+DWORD Offsets::bEngine;
+DWORD Offsets::LocalBase;
+
+
+DWORD Offsets::LocalPlayer = 0xC5B85C;		// dwLocalPlayer
+DWORD Offsets::oFlags = 0x100;				// m_fFlags
+DWORD Offsets::forceJump = 0x50DAD7C;		// dwForceJump
+DWORD Offsets::forceAttack = 0x30797A8;		// dwForceAttack
+
+DWORD Offsets::bSpotted = 0x939;				// m_bSpotted
+DWORD Offsets::EntityList = 0x4C380DC;		// dwEntityList
+DWORD Offsets::iTeam = 0xF0;					// m_iTeamNum
+DWORD Offsets::oDormant = 0xE9;
+DWORD Offsets::iHealth = 0xFC;				// m_iHealth
+DWORD Offsets::bIsDefusing = 0x3898;			// m_bIsDefusing
+DWORD Offsets::mMoveType = 0x258;			// m_MoveType
+DWORD Offsets::mVecVelocity = 0x110;			// m_vecVelocity
+
+DWORD Offsets::glowObject = 0x5177DB0;		// dwGlowObjectManager
+DWORD Offsets::glowIndex = 0xA320;			// m_iGlowIndex
+DWORD Offsets::bSpottedMask = 0x97C;			// m_bSpottedByMask
+
+DWORD Offsets::iCrosshairId = 0xB2B8;		// m_iCrosshairId
+
+DWORD Offsets::flFlashDuration = 0xA308;		// m_flFlashDuration
+DWORD Offsets::flFlashMaxAlpha = 0xA304;		//m_flFlashMaxAlpha

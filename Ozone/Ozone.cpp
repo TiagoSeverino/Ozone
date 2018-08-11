@@ -34,9 +34,9 @@ private:
 	void GlowPlayer(DWORD player, ESP::GlowColor color) // show player
 	{
 		DWORD GlowIndex = 0;
-		MemoryManager->Read<DWORD>(player + Config::glowIndex, GlowIndex);
+		MemoryManager->Read<DWORD>(player + Offsets::glowIndex, GlowIndex);
 		DWORD GlowObject = 0;
-		MemoryManager->Read<DWORD>(Config::bClient + Config::glowObject, GlowObject);
+		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::glowObject, GlowObject);
 
 		float rgba[4] = {
 			color.r,
@@ -54,13 +54,13 @@ private:
 
 	void ScanPlayers() {
 
-		MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
+		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
 		float FlashDuration = 0.f;
-		MemoryManager->Read<float>(Config::LocalBase + Config::flFlashDuration, FlashDuration);
+		MemoryManager->Read<float>(Offsets::LocalBase + Offsets::flFlashDuration, FlashDuration);
 
 		if (FlashDuration > 0.f)
-			MemoryManager->Write(Config::LocalBase + Config::flFlashDuration, 0.f);
+			MemoryManager->Write(Offsets::LocalBase + Offsets::flFlashDuration, 0.f);
 
 		/*
 		float FlashAlpha = 0.f;
@@ -71,24 +71,24 @@ private:
 		*/
 
 		DWORD myTeam = 0;
-		MemoryManager->Read<DWORD>(Config::LocalBase + Config::iTeam, myTeam);
+		MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
 		for (int i = 0; i <= 64; ++i)
 		{
 			DWORD player = 0;
-			MemoryManager->Read<DWORD>(Config::bClient + Config::EntityList + (i - 1) * 0x10, player);
+			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (i - 1) * 0x10, player);
 
 			if (player == 0)
 				continue;
 
 			bool dormant = false;
-			MemoryManager->Read<bool>(player + Config::oDormant, dormant);
+			MemoryManager->Read<bool>(player + Offsets::oDormant, dormant);
 
 			if (dormant)
 				continue;
 
 			DWORD team = 0;
-			MemoryManager->Read<DWORD>(player + Config::iTeam, team);
+			MemoryManager->Read<DWORD>(player + Offsets::iTeam, team);
 
 			if (team != 2 && team != 3)
 				continue;
@@ -100,11 +100,11 @@ private:
 				}
 
 				int health = 0;
-				MemoryManager->Read<int>(player + Config::iHealth, health);
+				MemoryManager->Read<int>(player + Offsets::iHealth, health);
 
 				bool isDefusing = false;
 				if (team == 3)
-					MemoryManager->Read<bool>(player + Config::bIsDefusing, isDefusing);
+					MemoryManager->Read<bool>(player + Offsets::bIsDefusing, isDefusing);
 
 				if (isDefusing)
 				{
@@ -135,7 +135,7 @@ private:
 			if (!this->isRadarHack)
 				continue;
 
-			MemoryManager->Write(player + Config::bSpotted, 1); // Write 1 to let us see him on radar
+			MemoryManager->Write(player + Offsets::bSpotted, 1); // Write 1 to let us see him on radar
 		}
 	}
 public:
@@ -174,25 +174,25 @@ public:
 		while (this->isRunning) {
 			if (GetAsyncKeyState(VK_SPACE) & 0x8000 && this->isBhop)
 			{
-				MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
+				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
 				Vector velocity;
-				MemoryManager->Read<Vector>(Config::LocalBase + Config::mVecVelocity, velocity);
+				MemoryManager->Read<Vector>(Offsets::LocalBase + Offsets::mVecVelocity, velocity);
 
 				if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 1.f)
 					continue;
 
 				DWORD movetype = 0;
-				MemoryManager->Read<DWORD>(Config::LocalBase + Config::mMoveType, movetype);
+				MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::mMoveType, movetype);
 
 				if (movetype == 8 || movetype == 9) // MOVETYPE_NOCLIP OR MOVETYPE_LADDER
 					continue;
 
 				BYTE fFlags = 0;
-				MemoryManager->Read<BYTE>(Config::LocalBase + Config::oFlags, fFlags);
+				MemoryManager->Read<BYTE>(Offsets::LocalBase + Offsets::oFlags, fFlags);
 
 				if (fFlags & (1 << 0)) // Check for FL_ONGROUND
-					MemoryManager->Write(Config::bClient + Config::forceJump, 6); // Will force jump for 1 tick only
+					MemoryManager->Write(Offsets::bClient + Offsets::forceJump, 6); // Will force jump for 1 tick only
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		}
@@ -219,28 +219,28 @@ public:
 		while (this->isRunning) {
 			if (GetAsyncKeyState((int)'F') & 0x8000 && isTriggerBot)
 			{
-				MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
+				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
 				int cross = 0;
-				MemoryManager->Read<int>(Config::LocalBase + Config::iCrosshairId, cross);
+				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iCrosshairId, cross);
 
 				if (cross > 0 && cross <= 64) {
 					DWORD myTeam = 0;
-					MemoryManager->Read<DWORD>(Config::LocalBase + Config::iTeam, myTeam);
+					MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
 					DWORD playerInCross = 0;
-					MemoryManager->Read<DWORD>(Config::bClient + Config::EntityList + (cross - 1) * 0x10, playerInCross);
+					MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (cross - 1) * 0x10, playerInCross);
 
 					DWORD teamInCross = 0;
-					MemoryManager->Read<DWORD>(playerInCross + Config::iTeam, teamInCross);
+					MemoryManager->Read<DWORD>(playerInCross + Offsets::iTeam, teamInCross);
 
 					bool dormant = false;
-					MemoryManager->Read<bool>(playerInCross + Config::oDormant, dormant);
+					MemoryManager->Read<bool>(playerInCross + Offsets::oDormant, dormant);
 
 					if (teamInCross != myTeam && !dormant) { // if enemy
-						MemoryManager->Write(Config::bClient + Config::forceAttack, 1); //Force Shoot
+						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 1); //Force Shoot
 						std::this_thread::sleep_for(std::chrono::milliseconds(10));
-						MemoryManager->Write(Config::bClient + Config::forceAttack, 0); //Stop Shoot
+						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 0); //Stop Shoot
 					}
 				}
 			}
@@ -292,7 +292,7 @@ int main()
 	{
 		if (!strcmp(m.szModule, "client_panorama.dll"))
 		{
-			Config::bClient = reinterpret_cast<DWORD>(m.modBaseAddr);
+			Offsets::bClient = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
 		}
 	}
@@ -301,7 +301,7 @@ int main()
 	{
 		if (!strcmp(m.szModule, "engine.dll"))
 		{
-			Config::bEngine = reinterpret_cast<DWORD>(m.modBaseAddr);
+			Offsets::bEngine = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
 		}
 	}

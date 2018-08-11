@@ -1,5 +1,5 @@
 #pragma once
-class Config
+class Offsets
 {
 public:
 	static DWORD bClient, bEngine, LocalBase;

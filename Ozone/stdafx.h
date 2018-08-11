@@ -14,4 +14,4 @@
 #include <tchar.h>
 
 #include "CMemoryManager.h"
-#include "Config.h"
+#include "Offsets.h"
