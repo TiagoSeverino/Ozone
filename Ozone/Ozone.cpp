@@ -149,7 +149,7 @@ public:
 		this->isRunning = true;
 		while (this->isRunning) {
 			ScanPlayers();
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			std::this_thread::sleep_for(std::chrono::milliseconds(8));
 		}
 	}
 
@@ -172,7 +172,7 @@ public:
 		this->isRunning = true;
 
 		while (this->isRunning) {
-			if (GetAsyncKeyState(VK_SPACE) & 0x8000 && this->isBhop)
+			if (GetAsyncKeyState(Config::Key::Bhop) & 0x8000 && this->isBhop)
 			{
 				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
@@ -194,7 +194,7 @@ public:
 				if (fFlags & (1 << 0)) // Check for FL_ONGROUND
 					MemoryManager->Write(Offsets::bClient + Offsets::forceJump, 6); // Will force jump for 1 tick only
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			std::this_thread::sleep_for(std::chrono::milliseconds(0));
 		}
 	}
 
@@ -217,7 +217,7 @@ public:
 		this->isRunning = true;
 
 		while (this->isRunning) {
-			if (GetAsyncKeyState((int)'F') & 0x8000 && isTriggerBot)
+			if (GetAsyncKeyState(Config::Key::Trigger) & 0x8000 && isTriggerBot)
 			{
 				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
@@ -239,7 +239,7 @@ public:
 
 					if (teamInCross != myTeam && !dormant) { // if enemy
 						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 1); //Force Shoot
-						std::this_thread::sleep_for(std::chrono::milliseconds(10));
+						std::this_thread::sleep_for(std::chrono::milliseconds(8));
 						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 0); //Stop Shoot
 					}
 				}
@@ -320,7 +320,7 @@ int main()
 
 	while (true)
 	{
-		if (GetAsyncKeyState(VK_DELETE) & 0x8000)
+		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000)
 		{
 			std::cout << "Closing Ozone!" << std::endl;
 			Beep(500, 200);

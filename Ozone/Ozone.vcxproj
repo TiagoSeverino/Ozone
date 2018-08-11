@@ -150,11 +150,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CMemoryManager.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="Offsets.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMemoryManager.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="Offsets.cpp" />
     <ClCompile Include="Ozone.cpp" />
     <ClCompile Include="stdafx.cpp">
