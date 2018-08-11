@@ -1,31 +1,4 @@
-﻿// Ozone.cpp : Defines the entry point for the application.
-//
-
-#include "stdafx.h"
-
-DWORD bClient, bEngine, LocalBase;	// some values
-DWORD LocalPlayer = 0xC5B85C;		// player offset	dwLocalPlayer
-DWORD oFlags = 0x100;				// flags offset		m_fFlags
-DWORD forceJump = 0x50DAD7C;		// jump offset		dwForceJump 
-DWORD forceAttack = 0x30797A8;		// fire shoot		dwForceAttack
-
-DWORD bSpotted = 0x939;				// radar point		m_bSpotted
-DWORD EntityList = 0x4C380DC;		// players offset	dwEntityList
-DWORD iTeam = 0xF0;					// team num offset	m_iTeamNum 
-DWORD oDormant = 0xE9;				// offset to check if tshe object is player
-DWORD iHealth = 0xFC;				//					m_iHealth
-DWORD bIsDefusing = 0x3898;			//					m_bIsDefusing
-DWORD mMoveType = 0x258;			//					m_MoveType
-DWORD mVecVelocity = 0x110;			//					m_vecVelocity 
-
-DWORD glowObject = 0x5177DB0;		//					dwGlowObjectManager
-DWORD glowIndex = 0xA320;			//					m_iGlowIndex
-DWORD bSpottedMask = 0x97C;			//					m_bSpottedByMask
-
-DWORD iCrosshairId = 0xB2B8;		//					m_iCrosshairId 
-
-DWORD flFlashDuration = 0xA308;		//					m_flFlashDuration 
-DWORD flFlashMaxAlpha = 0xA304;		//					m_flFlashMaxAlpha 
+﻿#include "stdafx.h"
 
 CMemoryManager* MemoryManager;
 
@@ -61,9 +34,9 @@ private:
 	void GlowPlayer(DWORD player, ESP::GlowColor color) // show player
 	{
 		DWORD GlowIndex = 0;
-		MemoryManager->Read<DWORD>(player + glowIndex, GlowIndex);
+		MemoryManager->Read<DWORD>(player + Config::glowIndex, GlowIndex);
 		DWORD GlowObject = 0;
-		MemoryManager->Read<DWORD>(bClient + glowObject, GlowObject);
+		MemoryManager->Read<DWORD>(Config::bClient + Config::glowObject, GlowObject);
 
 		float rgba[4] = {
 			color.r,
@@ -81,13 +54,13 @@ private:
 
 	void ScanPlayers() {
 
-		MemoryManager->Read<DWORD>(bClient + LocalPlayer, LocalBase);
+		MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
 
 		float FlashDuration = 0.f;
-		MemoryManager->Read<float>(LocalBase + flFlashDuration, FlashDuration);
+		MemoryManager->Read<float>(Config::LocalBase + Config::flFlashDuration, FlashDuration);
 
 		if (FlashDuration > 0.f)
-			MemoryManager->Write(LocalBase + flFlashDuration, 0.f);
+			MemoryManager->Write(Config::LocalBase + Config::flFlashDuration, 0.f);
 
 		/*
 		float FlashAlpha = 0.f;
@@ -98,24 +71,24 @@ private:
 		*/
 
 		DWORD myTeam = 0;
-		MemoryManager->Read<DWORD>(LocalBase + iTeam, myTeam);
+		MemoryManager->Read<DWORD>(Config::LocalBase + Config::iTeam, myTeam);
 
 		for (int i = 0; i <= 64; ++i)
 		{
 			DWORD player = 0;
-			MemoryManager->Read<DWORD>(bClient + EntityList + (i - 1) * 0x10, player);
+			MemoryManager->Read<DWORD>(Config::bClient + Config::EntityList + (i - 1) * 0x10, player);
 
 			if (player == 0)
 				continue;
 
 			bool dormant = false;
-			MemoryManager->Read<bool>(player + oDormant, dormant);
+			MemoryManager->Read<bool>(player + Config::oDormant, dormant);
 
 			if (dormant)
 				continue;
 
 			DWORD team = 0;
-			MemoryManager->Read<DWORD>(player + iTeam, team);
+			MemoryManager->Read<DWORD>(player + Config::iTeam, team);
 
 			if (team != 2 && team != 3)
 				continue;
@@ -127,11 +100,11 @@ private:
 				}
 
 				int health = 0;
-				MemoryManager->Read<int>(player + iHealth, health);
+				MemoryManager->Read<int>(player + Config::iHealth, health);
 
 				bool isDefusing = false;
 				if (team == 3)
-					MemoryManager->Read<bool>(player + bIsDefusing, isDefusing);
+					MemoryManager->Read<bool>(player + Config::bIsDefusing, isDefusing);
 
 				if (isDefusing)
 				{
@@ -162,7 +135,7 @@ private:
 			if (!this->isRadarHack)
 				continue;
 
-			MemoryManager->Write(player + bSpotted, 1); // Write 1 to let us see him on radar
+			MemoryManager->Write(player + Config::bSpotted, 1); // Write 1 to let us see him on radar
 		}
 	}
 public:
@@ -201,25 +174,25 @@ public:
 		while (this->isRunning) {
 			if (GetAsyncKeyState(VK_SPACE) & 0x8000 && this->isBhop)
 			{
-				MemoryManager->Read<DWORD>(bClient + LocalPlayer, LocalBase);
+				MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
 
 				Vector velocity;
-				MemoryManager->Read<Vector>(LocalBase + mVecVelocity, velocity);
+				MemoryManager->Read<Vector>(Config::LocalBase + Config::mVecVelocity, velocity);
 
 				if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 1.f)
 					continue;
 
 				DWORD movetype = 0;
-				MemoryManager->Read<DWORD>(LocalBase + mMoveType, movetype);
+				MemoryManager->Read<DWORD>(Config::LocalBase + Config::mMoveType, movetype);
 
 				if (movetype == 8 || movetype == 9) // MOVETYPE_NOCLIP OR MOVETYPE_LADDER
 					continue;
 
 				BYTE fFlags = 0;
-				MemoryManager->Read<BYTE>(LocalBase + oFlags, fFlags);
+				MemoryManager->Read<BYTE>(Config::LocalBase + Config::oFlags, fFlags);
 
 				if (fFlags & (1 << 0)) // Check for FL_ONGROUND
-					MemoryManager->Write(bClient + forceJump, 6); // Will force jump for 1 tick only
+					MemoryManager->Write(Config::bClient + Config::forceJump, 6); // Will force jump for 1 tick only
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		}
@@ -246,28 +219,28 @@ public:
 		while (this->isRunning) {
 			if (GetAsyncKeyState((int)'F') & 0x8000 && isTriggerBot)
 			{
-				MemoryManager->Read<DWORD>(bClient + LocalPlayer, LocalBase);
+				MemoryManager->Read<DWORD>(Config::bClient + Config::LocalPlayer, Config::LocalBase);
 
 				int cross = 0;
-				MemoryManager->Read<int>(LocalBase + iCrosshairId, cross);
+				MemoryManager->Read<int>(Config::LocalBase + Config::iCrosshairId, cross);
 
 				if (cross > 0 && cross <= 64) {
 					DWORD myTeam = 0;
-					MemoryManager->Read<DWORD>(LocalBase + iTeam, myTeam);
+					MemoryManager->Read<DWORD>(Config::LocalBase + Config::iTeam, myTeam);
 
 					DWORD playerInCross = 0;
-					MemoryManager->Read<DWORD>(bClient + EntityList + (cross - 1) * 0x10, playerInCross);
+					MemoryManager->Read<DWORD>(Config::bClient + Config::EntityList + (cross - 1) * 0x10, playerInCross);
 
 					DWORD teamInCross = 0;
-					MemoryManager->Read<DWORD>(playerInCross + iTeam, teamInCross);
+					MemoryManager->Read<DWORD>(playerInCross + Config::iTeam, teamInCross);
 
 					bool dormant = false;
-					MemoryManager->Read<bool>(playerInCross + oDormant, dormant);
+					MemoryManager->Read<bool>(playerInCross + Config::oDormant, dormant);
 
 					if (teamInCross != myTeam && !dormant) { // if enemy
-						MemoryManager->Write(bClient + forceAttack, 1); //Force Shoot
+						MemoryManager->Write(Config::bClient + Config::forceAttack, 1); //Force Shoot
 						std::this_thread::sleep_for(std::chrono::milliseconds(10));
-						MemoryManager->Write(bClient + forceAttack, 0); //Stop Shoot
+						MemoryManager->Write(Config::bClient + Config::forceAttack, 0); //Stop Shoot
 					}
 				}
 			}
@@ -319,7 +292,7 @@ int main()
 	{
 		if (!strcmp(m.szModule, "client_panorama.dll"))
 		{
-			bClient = reinterpret_cast<DWORD>(m.modBaseAddr);
+			Config::bClient = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
 		}
 	}
@@ -328,7 +301,7 @@ int main()
 	{
 		if (!strcmp(m.szModule, "engine.dll"))
 		{
-			bEngine = reinterpret_cast<DWORD>(m.modBaseAddr);
+			Config::bEngine = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
 		}
 	}

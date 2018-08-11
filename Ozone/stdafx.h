@@ -1,10 +1,4 @@
-﻿// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
-
-#pragma once
-
+﻿#pragma once
 
 #include <ctime> // For std::chrono
 #include <thread> // For std::this_thread
@@ -20,5 +14,4 @@
 #include <tchar.h>
 
 #include "CMemoryManager.h"
-
-// TODO: reference additional headers your program requires here
+#include "Config.h"

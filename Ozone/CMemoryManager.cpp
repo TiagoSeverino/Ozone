@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 bool CMemoryManager::Attach(const std::string& strProcessName)
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
