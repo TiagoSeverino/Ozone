@@ -3,9 +3,9 @@ DWORD Offsets::bClient;
 DWORD Offsets::bEngine;
 DWORD Offsets::LocalBase;
 
-DWORD Offsets::LocalPlayer = 0xC5C85C;		// dwLocalPlayer
+DWORD Offsets::LocalPlayer = 0xC5C86C;		// dwLocalPlayer
 DWORD Offsets::oFlags = 0x100;				// m_fFlags
-DWORD Offsets::forceJump = 0x50DBDFC;		// dwForceJump
+DWORD Offsets::forceJump = 0x50DBDFC;		// dwForceJumps
 DWORD Offsets::forceAttack = 0x307A81C;		// dwForceAttack
 
 DWORD Offsets::bSpotted = 0x939;			// m_bSpotted
