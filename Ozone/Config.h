@@ -7,4 +7,5 @@ public:
 		static int Bhop;
 		static int Trigger;
 	};
+	static std::string Version;
 };

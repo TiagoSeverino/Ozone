@@ -1,8 +1,10 @@
 ﻿#pragma once
+#pragma comment(lib,"ws2_32.lib")
 
 #include <ctime> // For std::chrono
 #include <thread> // For std::this_thread
 
+#include <algorithm>
 #include <windows.h> //Standard Windows Functions/Data Types
 #include <iostream> //Constains Input/Output Functions (cin/cout etc..)
 #include <TlHelp32.h> //Contains Read/Write Functions

@@ -256,9 +256,149 @@ ESP Esp;
 BHOP Bhop;
 TriggerBot Triggerbot;
 
+bool WebRequest(std::string url, std::string location, std::string &website_HTML) {
+	WSADATA wsaData;
+	SOCKET Socket;
+	SOCKADDR_IN SockAddr;
+	int lineCount = 0;
+	int rowCount = 0;
+	struct hostent *host;
+	std::locale local;
+	char buffer[10000];
+	int i = 0;
+	int nDataLength;
+
+	//HTTP GET
+	std::string get_http = "GET /" + location + " HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
+
+
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+		std::cout << "WSAStartup failed.\n";
+		system("pause");
+		return false;
+	}
+
+	Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	host = gethostbyname(url.c_str());
+
+	SockAddr.sin_port = htons(80);
+	SockAddr.sin_family = AF_INET;
+	SockAddr.sin_addr.s_addr = *((unsigned long*)host->h_addr);
+
+	if (connect(Socket, (SOCKADDR*)(&SockAddr), sizeof(SockAddr)) != 0) {
+		std::cout << "Could not connect to server";
+		system("pause");
+		return false;
+	}
+
+	// send GET / HTTP
+	send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
+
+	// recieve html
+	while ((nDataLength = recv(Socket, buffer, 10000, 0)) > 0) {
+		int i = 0;
+		while (buffer[i] >= 32 || buffer[i] == '\n' || buffer[i] == '\r') {
+
+			website_HTML += buffer[i];
+			i += 1;
+		}
+	}
+
+	closesocket(Socket);
+	WSACleanup();
+
+	return true;
+}
+
+bool getHWID(std::string &hwid) {
+	HW_PROFILE_INFO hwProfileInfo;
+
+	if (GetCurrentHwProfile(&hwProfileInfo) != NULL) {
+		hwid = hwProfileInfo.szHwProfileGuid;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 int main()
 {
-	SetConsoleTitle(_T("Ozone V0.1"));
+	std::string title = "D0minator.xyz Version - " + Config::Version;
+
+	SetConsoleTitle(_T(title.c_str()));
+
+	std::string hwid;
+
+	if (!getHWID(hwid)) {
+		std::cout << "Error reading serial";
+		system("pause");
+		return 0;
+	}
+
+	std::hash<std::string> hash_fn;
+	size_t str_hash = hash_fn((hwid + "D0minator.xyz"));
+
+	std::string response;
+
+	printf("Connecting to server\n");
+	if (!WebRequest("localhost", std::to_string(str_hash), response))
+		return 0;
+
+	response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
+
+	std::vector<std::string> results;
+
+	int last_split = 0;
+	for (int i = 0; i < response.length(); i++) {
+
+		if (response[i] == '\n') {
+			results.push_back(response.substr(last_split, i - last_split));
+			last_split = i + 1;
+		}
+	}
+
+	std::string sCode;
+	std::string sStatus;
+	std::string sVersion;
+	std::string sDaysLeft;
+
+	for (std::string &result : results) {
+		if (result.find("Code:") != -1)
+			sCode = result.substr(6, result.length());
+
+		if (result.find("Status:") != -1)
+			sStatus = result.substr(8, result.length());
+
+		if (result.find("Version:") != -1)
+			sVersion = result.substr(9, result.length());
+
+		if (result.find("DaysLeft:") != -1)
+			sDaysLeft = result.substr(10, result.length());
+	}
+
+	if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0) {
+		printf("Error connecting to server");
+		system("pause");
+		return 0;
+	}
+	
+	system("cls");
+
+	if (strcmp(sVersion.c_str(), Config::Version.c_str())) {
+		printf("I’m an obsolete design. New D0minator.xyz is faster, more powerful and more intelligent. It’s a far more effective killing machine\n");
+		system("pause");
+		return 0;
+	}
+
+	if (strcmp(sStatus.c_str(), "Activated")) {
+		printf("Activate your serial using the following code: %s\n", sCode.c_str());
+		system("pause");
+		return 0;
+	}
+
+	printf("Welcome to D0minator.xyz! You have %s days left!\n", sDaysLeft.c_str());
 
 	std::cout << "Waiting for CS:GO!" << std::endl;
 
@@ -279,13 +419,13 @@ int main()
 	std::cout << "CS:GO Found!" << std::endl;
 
 
-	std::cout << "Waiting for modules!" << std::endl;
+	//std::cout << "Waiting for modules!" << std::endl;
 
 	while (!MemoryManager->GrabModule("client_panorama.dll") || !MemoryManager->GrabModule("engine.dll")) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 	}
 
-	std::cout << "Modules Found" << std::endl;
+	//std::cout << "Modules Found" << std::endl;
 
 
 	for (auto m : MemoryManager->GetModules())
@@ -306,7 +446,8 @@ int main()
 		}
 	}
 
-	std::cout << "Ozone started!" << std::endl;
+	printf("D0minator.xyz started!\n");
+	printf("Come with me if you want to live\n");
 
 	Beep(1000, 200);
 
@@ -322,7 +463,7 @@ int main()
 	{
 		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000)
 		{
-			std::cout << "Closing Ozone!" << std::endl;
+			std::cout << "I'll be back!" << std::endl;
 			Beep(500, 200);
 
 			Esp.Stop();
