@@ -387,7 +387,7 @@ int main()
 	system("cls");
 
 	if (strcmp(sVersion.c_str(), Config::Version.c_str())) {
-		printf("I’m an obsolete design. New D0minator.xyz is faster, more powerful and more intelligent. It’s a far more effective killing machine\n");
+		printf("I'm an obsolete design.\nNew D0minator.xyz is faster, more powerful and more intelligent. It's a far more effective killing machine\n");
 		system("pause");
 		return 0;
 	}
@@ -463,7 +463,7 @@ int main()
 	{
 		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000)
 		{
-			std::cout << "I'll be back!" << std::endl;
+			std::cout << "Hasta la vista, baby!" << std::endl;
 			Beep(500, 200);
 
 			Esp.Stop();
