@@ -343,7 +343,7 @@ int main()
 	std::string response;
 
 	printf("Connecting to server\n");
-	if (!WebRequest("localhost", std::to_string(str_hash), response))
+	if (!WebRequest("localhost", ("api/" + std::to_string(str_hash)), response))
 		return 0;
 
 	response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
