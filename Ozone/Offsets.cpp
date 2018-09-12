@@ -3,13 +3,13 @@ DWORD Offsets::bClient;
 DWORD Offsets::bEngine;
 DWORD Offsets::LocalBase;
 
-DWORD Offsets::LocalPlayer = 0xC6187C;		// dwLocalPlayer
+DWORD Offsets::LocalPlayer = 0xC5E87C;		// dwLocalPlayer
 DWORD Offsets::oFlags = 0x100;				// m_fFlags
-DWORD Offsets::forceJump = 0x50E0E78;		// dwForceJump
-DWORD Offsets::forceAttack = 0x307F8A8;		// dwForceAttack
+DWORD Offsets::forceJump = 0x50DE048;		// dwForceJump
+DWORD Offsets::forceAttack = 0x307CA78;		// dwForceAttack
 
 DWORD Offsets::bSpotted = 0x939;			// m_bSpotted
-DWORD Offsets::EntityList = 0x4C3E1B4;		// dwEntityList
+DWORD Offsets::EntityList = 0x4C3B384;		// dwEntityList
 DWORD Offsets::iTeam = 0xF0;				// m_iTeamNum
 DWORD Offsets::oDormant = 0xE9;				// oDormant
 DWORD Offsets::iHealth = 0xFC;				// m_iHealth
@@ -17,7 +17,7 @@ DWORD Offsets::bIsDefusing = 0x3898;		// m_bIsDefusing
 DWORD Offsets::mMoveType = 0x258;			// m_MoveType
 DWORD Offsets::mVecVelocity = 0x110;		// m_vecVelocity
 
-DWORD Offsets::glowObject = 0x517D4A8;		// dwGlowObjectManager
+DWORD Offsets::glowObject = 0x517A668;		// dwGlowObjectManager
 DWORD Offsets::glowIndex = 0xA320;			// m_iGlowIndex
 DWORD Offsets::bSpottedMask = 0x97C;		// m_bSpottedByMask
 
