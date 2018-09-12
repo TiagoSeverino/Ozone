@@ -54,7 +54,7 @@ private:
 
 	void ScanPlayers() {
 
-		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);5
+		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
 		float FlashDuration = 0.f;
 		MemoryManager->Read<float>(Offsets::LocalBase + Offsets::flFlashDuration, FlashDuration);
