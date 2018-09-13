@@ -23,5 +23,4 @@ DWORD Offsets::bSpottedMask = 0x97C;		// m_bSpottedByMask
 
 DWORD Offsets::iCrosshairId = 0xB2B8;		// m_iCrosshairId
 
-DWORD Offsets::flFlashDuration = 0xA308;	// m_flFlashDuration
 DWORD Offsets::flFlashMaxAlpha = 0xA304;	// m_flFlashMaxAlpha

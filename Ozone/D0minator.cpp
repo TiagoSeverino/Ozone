@@ -7,10 +7,47 @@ struct Vector
 	float x, y, z;
 };
 
+class NoFlash {
+private:
+	bool isRunning;
+public:
+	bool isNoFlash;
+
+	NoFlash(bool isNoFlash = false) {
+		this->isNoFlash = isNoFlash;
+	}
+
+	void Start() {
+		this->isRunning = true;
+
+		while (this->isRunning)
+		{
+			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+
+			float FlashAlpha = 0.f;
+			MemoryManager->Read<float>(Offsets::LocalBase + Offsets::flFlashMaxAlpha, FlashAlpha);
+
+			float flashAlpha;
+
+			if (this->isNoFlash)
+				flashAlpha = float(Config::FlashPercentage / 100.f * 255.f);
+			else
+				flashAlpha = 255.f;
+
+			if (FlashAlpha != flashAlpha)
+				MemoryManager->Write(Offsets::LocalBase + Offsets::flFlashMaxAlpha, flashAlpha);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		}
+	}
+
+	void Stop() {
+		this->isRunning = false;
+	}
+};
+
 class ESP {
 private:
-	bool isWallHack;
-	bool isRadarHack;
 	bool isRunning;
 
 	struct GlowColor
@@ -53,23 +90,6 @@ private:
 	}
 
 	void ScanPlayers() {
-
-		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
-
-		float FlashDuration = 0.f;
-		MemoryManager->Read<float>(Offsets::LocalBase + Offsets::flFlashDuration, FlashDuration);
-
-		if (FlashDuration > 0.f)
-			MemoryManager->Write(Offsets::LocalBase + Offsets::flFlashDuration, 0.f);
-
-		/*
-		float FlashAlpha = 0.f;
-		MemoryManager->Read<float>(LocalBase + flFlashMaxAlpha, FlashAlpha);
-
-		if (FlashAlpha > 0.f)
-			MemoryManager->Write(LocalBase + flFlashMaxAlpha, 0.f);
-		*/
-
 		DWORD myTeam = 0;
 		MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
@@ -77,6 +97,12 @@ private:
 		{
 			DWORD player = 0;
 			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (i - 1) * 0x10, player);
+
+			if (this->isRadarHack)
+				MemoryManager->Write(player + Offsets::bSpotted, true);
+
+			if (!this->isWallHack)
+				continue;
 
 			if (player == 0)
 				continue;
@@ -139,7 +165,9 @@ private:
 		}
 	}
 public:
-	
+	bool isWallHack;
+	bool isRadarHack;
+
 	ESP(bool isWallHack = false, bool isRadarHack = false) {
 		this->isWallHack = isWallHack;
 		this->isRadarHack = isRadarHack;
@@ -149,7 +177,7 @@ public:
 		this->isRunning = true;
 		while (this->isRunning) {
 			ScanPlayers();
-			std::this_thread::sleep_for(std::chrono::milliseconds(8));
+			std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		}
 	}
 
@@ -160,9 +188,9 @@ public:
 
 class BHOP {
 private:
-	bool isBhop;
 	bool isRunning;
 public:
+	bool isBhop;
 
 	BHOP(bool isBhop = false) {
 		this->isBhop = isBhop;
@@ -172,29 +200,35 @@ public:
 		this->isRunning = true;
 
 		while (this->isRunning) {
-			if (GetAsyncKeyState(Config::Key::Bhop) & 0x8000 && this->isBhop)
-			{
-				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+			if (this->isBhop) {
+				if (GetAsyncKeyState(Config::Key::Bhop) & 0x8000)
+				{
+					MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
-				Vector velocity;
-				MemoryManager->Read<Vector>(Offsets::LocalBase + Offsets::mVecVelocity, velocity);
+					Vector velocity;
+					MemoryManager->Read<Vector>(Offsets::LocalBase + Offsets::mVecVelocity, velocity);
 
-				if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 1.f)
-					continue;
+					if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 1.f)
+						continue;
 
-				DWORD movetype = 0;
-				MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::mMoveType, movetype);
+					DWORD movetype = 0;
+					MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::mMoveType, movetype);
 
-				if (movetype == 8 || movetype == 9) // MOVETYPE_NOCLIP OR MOVETYPE_LADDER
-					continue;
+					if (movetype == 8 || movetype == 9) // MOVETYPE_NOCLIP OR MOVETYPE_LADDER
+						continue;
 
-				BYTE fFlags = 0;
-				MemoryManager->Read<BYTE>(Offsets::LocalBase + Offsets::oFlags, fFlags);
+					BYTE fFlags = 0;
+					MemoryManager->Read<BYTE>(Offsets::LocalBase + Offsets::oFlags, fFlags);
 
-				if (fFlags & (1 << 0)) // Check for FL_ONGROUND
-					MemoryManager->Write(Offsets::bClient + Offsets::forceJump, 6); // Will force jump for 1 tick only
+					if (fFlags & (1 << 0)) // Check for FL_ONGROUND
+						MemoryManager->Write(Offsets::bClient + Offsets::forceJump, 6); // Will force jump for 1 tick only
+				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(0));
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
 		}
 	}
 
@@ -205,9 +239,9 @@ public:
 
 class TriggerBot {
 private:
-	bool isTriggerBot;
 	bool isRunning;
 public:
+	bool isTriggerBot;
 
 	TriggerBot(bool isTriggerBot = false) {
 		this->isTriggerBot = isTriggerBot;
@@ -217,32 +251,41 @@ public:
 		this->isRunning = true;
 
 		while (this->isRunning) {
-			if (GetAsyncKeyState(Config::Key::Trigger) & 0x8000 && isTriggerBot)
-			{
-				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+			if (isTriggerBot) {
+				if (GetAsyncKeyState(Config::Key::Trigger) & 0x8000)
+				{
+					MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
-				int cross = 0;
-				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iCrosshairId, cross);
+					int cross = 0;
+					MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iCrosshairId, cross);
 
-				if (cross > 0 && cross <= 64) {
-					DWORD myTeam = 0;
-					MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
+					if (cross > 0 && cross <= 64) {
+						DWORD myTeam = 0;
+						MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
-					DWORD playerInCross = 0;
-					MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (cross - 1) * 0x10, playerInCross);
+						DWORD playerInCross = 0;
+						MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (cross - 1) * 0x10, playerInCross);
 
-					DWORD teamInCross = 0;
-					MemoryManager->Read<DWORD>(playerInCross + Offsets::iTeam, teamInCross);
+						DWORD teamInCross = 0;
+						MemoryManager->Read<DWORD>(playerInCross + Offsets::iTeam, teamInCross);
 
-					bool dormant = false;
-					MemoryManager->Read<bool>(playerInCross + Offsets::oDormant, dormant);
+						bool dormant = false;
+						MemoryManager->Read<bool>(playerInCross + Offsets::oDormant, dormant);
 
-					if (teamInCross != myTeam && !dormant) { // if enemy
-						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 1); //Force Shoot
-						std::this_thread::sleep_for(std::chrono::milliseconds(8));
-						MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 0); //Stop Shoot
+						if (teamInCross != myTeam && !dormant) { // if enemy
+							std::this_thread::sleep_for(std::chrono::milliseconds(Config::TriggerDelay));
+							MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 1); //Force Shoot
+							std::this_thread::sleep_for(std::chrono::milliseconds(10));
+							MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 0); //Stop Shoot
+							std::this_thread::sleep_for(std::chrono::milliseconds(5));
+						}
 					}
 				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 		}
 	}
@@ -254,6 +297,7 @@ public:
 
 ESP Esp;
 BHOP Bhop;
+NoFlash Noflash;
 TriggerBot Triggerbot;
 
 bool WebRequest(std::string url, std::string location, std::string &website_HTML) {
@@ -451,12 +495,14 @@ int main()
 
 	Beep(1000, 200);
 
-	Esp = ESP(true, true);
-	Bhop = BHOP(true);
-	Triggerbot = TriggerBot(true);
+	Esp = ESP(Config::WHDefault, Config::RadarDefault);
+	Bhop = BHOP(Config::BHopDefault);
+	Noflash = NoFlash(Config::NoFlashDefault);
+	Triggerbot = TriggerBot(Config::TriggerDefault);
 
 	std::thread tEsp(&ESP::Start, &Esp);
 	std::thread tBhop(&BHOP::Start, &Bhop);
+	std::thread tNoFlash(&NoFlash::Start, &Noflash);
 	std::thread tTriggerBot(&TriggerBot::Start, &Triggerbot);
 
 	while (true)
@@ -468,14 +514,71 @@ int main()
 
 			Esp.Stop();
 			Bhop.Stop();
+			Noflash.Stop();
 			Triggerbot.Stop();
 
 			tEsp.join();
 			tBhop.join();
+			tNoFlash.join();
 			tTriggerBot.join();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			break;
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleBHop) & 0x8000)
+		{
+			Bhop.isBhop = !Bhop.isBhop;
+
+			if (Bhop.isBhop)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleNoFlash) & 0x8000)
+		{
+			Noflash.isNoFlash = !Noflash.isNoFlash;
+
+			if (Noflash.isNoFlash)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleRadar) & 0x8000)
+		{
+			Esp.isRadarHack = !Esp.isRadarHack;
+
+			if (Esp.isRadarHack)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleTrigger) & 0x8000)
+		{
+			Triggerbot.isTriggerBot = !Triggerbot.isTriggerBot;
+			
+			if (Triggerbot.isTriggerBot)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleWH) & 0x8000)
+		{
+			Esp.isWallHack = !Esp.isWallHack;
+
+			if (Esp.isWallHack)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

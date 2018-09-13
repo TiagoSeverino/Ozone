@@ -23,6 +23,5 @@ public:
 
 	static DWORD iCrosshairId;				// m_iCrosshairId
 
-	static DWORD flFlashDuration;			// m_flFlashDuration
 	static DWORD flFlashMaxAlpha;			// m_flFlashMaxAlpha
 };
