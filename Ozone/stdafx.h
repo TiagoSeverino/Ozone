@@ -18,3 +18,4 @@
 #include "CMemoryManager.h"
 #include "Offsets.h"
 #include "Config.h"
+#include "Files.h"

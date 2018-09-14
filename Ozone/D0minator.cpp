@@ -1,4 +1,14 @@
 ﻿#include "stdafx.h"
+#pragma warning ( disable : 4789 )
+
+//#define Test_Mod
+#ifndef Test_Mod
+	#define _api_url "api.d0minator.xyz"
+#else
+	#define _api_url "localhost"
+#endif // Test_Mod
+
+#define api_url std::string(_api_url)
 
 CMemoryManager* MemoryManager;
 
@@ -330,7 +340,7 @@ bool WebRequest(std::string url, std::string location, std::string &website_HTML
 	SockAddr.sin_addr.s_addr = *((unsigned long*)host->h_addr);
 
 	if (connect(Socket, (SOCKADDR*)(&SockAddr), sizeof(SockAddr)) != 0) {
-		std::cout << "Could not connect to server";
+		std::cout << "Could not connect to server\n";
 		system("pause");
 		return false;
 	}
@@ -367,16 +377,89 @@ bool getHWID(std::string &hwid) {
 	}
 }
 
+VOID startup(LPCTSTR lpApplicationName)
+{
+	// additional information
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	// set the size of the structures
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// start the program up
+	CreateProcess(lpApplicationName,   // the path
+		NULL,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+	);
+	// Close process and thread handles. 
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+}
+
 int main()
 {
+	system("cls");
 	std::string title = "D0minator.xyz Version - " + Config::Version;
 
 	SetConsoleTitle(_T(title.c_str()));
 
+	g_pFiles->OnSetup("D0minator.cfg", "C:\\temp\\");
+
+	char elem[] = "Features";
+
+	bool b = true;
+	char field[] = "WallHack";
+	Config::WHDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "NoFlash");
+	Config::NoFlashDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "TriggerBot");
+	Config::TriggerDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "RadarHack");
+	Config::RadarDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "BHOP");
+	Config::BHopDefault = g_pFiles->ReadBool(elem, field);
+
+
+	strcpy(elem, "Keys");
+
+	strcpy(field, "ToggleWallHack");
+	Config::Key::ToggleWH = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleNoFlash");
+	Config::Key::ToggleNoFlash = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleTriggerBot");
+	Config::Key::ToggleTrigger = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleRadarHack");
+	Config::Key::ToggleRadar = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleBHOP");
+	Config::Key::ToggleBHop = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "Exit");
+	Config::Key::Exit = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "EnableTriggerBot");
+	Config::Key::Trigger = g_pFiles->ReadInt(elem, field);
+
+	strcpy(elem, "TriggerBot");
+
+	strcpy(field, "Delay");
+	Config::TriggerDelay = g_pFiles->ReadInt(elem, field);
+
+	strcpy(elem, "NoFlash");
+
+	strcpy(field, "FlashPercentage");
+	Config::FlashPercentage = g_pFiles->ReadInt(elem, field);
+
 	std::string hwid;
 
 	if (!getHWID(hwid)) {
-		std::cout << "Error reading serial";
+		std::cout << "Error reading serial" << std::endl;
 		system("pause");
 		return 0;
 	}
@@ -387,8 +470,11 @@ int main()
 	std::string response;
 
 	printf("Connecting to server\n");
-	if (!WebRequest("api.d0minator.xyz", ("api/" + std::to_string(str_hash)), response))
+	if (!WebRequest(api_url, ("api/" + std::to_string(str_hash)), response)) {
+		std::cout << "Error connecting to server" << std::endl;
+		system("pause");
 		return 0;
+	}
 
 	response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
 
@@ -407,6 +493,8 @@ int main()
 	std::string sStatus;
 	std::string sVersion;
 	std::string sDaysLeft;
+	std::string sHoursLeft;
+	std::string sMinutesLeft;
 
 	for (std::string &result : results) {
 		if (result.find("Code:") != -1)
@@ -420,9 +508,15 @@ int main()
 
 		if (result.find("DaysLeft:") != -1)
 			sDaysLeft = result.substr(10, result.length());
+
+		if (result.find("HoursLeft:") != -1)
+			sHoursLeft = result.substr(11, result.length());
+
+		if (result.find("MinutesLeft:") != -1)
+			sMinutesLeft = result.substr(13, result.length());
 	}
 
-	if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0) {
+	if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0 && !sHoursLeft.length() > 0 && !sMinutesLeft.length() > 0) {
 		printf("Error connecting to server");
 		system("pause");
 		return 0;
@@ -437,12 +531,43 @@ int main()
 	}
 
 	if (strcmp(sStatus.c_str(), "Activated")) {
-		printf("Activate your serial using the following code: %s\n", sCode.c_str());
+		printf("Insert your serial key: ");
+
+		std::string line;
+		std::getline(std::cin, line);
+
+		response.clear();
+		WebRequest(api_url, ("api/" + sCode + "/" + line), response);
+
+		response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
+
+		results.clear();
+
+		last_split = 0;
+		for (int i = 0; i < response.length(); i++) {
+			if (response[i] == '\n') {
+				results.push_back(response.substr(last_split, i - last_split));
+				last_split = i + 1;
+			}
+		}
+
+		std::string res;
+
+		for (std::string &result : results) 
+			if (result.find("Res:") != -1)
+				res = result.substr(5, result.length());
+
+		printf("%s\n", res.c_str());
 		system("pause");
+
+		char myPath[_MAX_PATH + 1];
+		GetModuleFileName(NULL, myPath, _MAX_PATH);
+
+		startup(myPath);
 		return 0;
 	}
 
-	printf("Welcome to D0minator.xyz! You have %s days left!\n", sDaysLeft.c_str());
+	printf("Welcome to D0minator.xyz! You have %s days, %s hours and %s minutes left!\n", sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
 
 	std::cout << "Waiting for CS:GO!" << std::endl;
 
@@ -462,15 +587,8 @@ int main()
 
 	std::cout << "CS:GO Found!" << std::endl;
 
-
-	//std::cout << "Waiting for modules!" << std::endl;
-
-	while (!MemoryManager->GrabModule("client_panorama.dll") || !MemoryManager->GrabModule("engine.dll")) {
+	while (!MemoryManager->GrabModule("client_panorama.dll") || !MemoryManager->GrabModule("engine.dll"))
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-	}
-
-	//std::cout << "Modules Found" << std::endl;
-
 
 	for (auto m : MemoryManager->GetModules())
 	{

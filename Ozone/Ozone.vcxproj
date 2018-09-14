@@ -121,7 +121,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="CMemoryManager.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Files.h" />
     <ClInclude Include="Offsets.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="CMemoryManager.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Files.cpp" />
     <ClCompile Include="Offsets.cpp" />
     <ClCompile Include="D0minator.cpp" />
     <ClCompile Include="stdafx.cpp">
