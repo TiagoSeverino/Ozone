@@ -47,7 +47,7 @@ public:
 			if (FlashAlpha != flashAlpha)
 				MemoryManager->Write(Offsets::LocalBase + Offsets::flFlashMaxAlpha, flashAlpha);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	}
 
@@ -412,7 +412,7 @@ int main()
 
 	SetConsoleTitle(_T(title.c_str()));
 
-	g_pFiles->OnSetup("D0minator.cfg", "C:\\temp\\");
+	g_pFiles->OnSetup("config.cfg", "C:\\D0minator\\");
 
 	char elem[] = "Features";
 
