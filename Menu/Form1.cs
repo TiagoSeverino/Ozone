@@ -14,7 +14,7 @@ namespace Menu
 {
     public partial class fMenu : Form
     {
-        string path = @"C:\D0minator\config.cfg.cfg";
+        string path = @"C:\D0minator\config.cfg";
         public fMenu()
         {
             InitializeComponent();
