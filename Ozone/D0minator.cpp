@@ -428,9 +428,6 @@ int main()
 	strcpy(field, "BHOP");
 	Config::BHopDefault = g_pFiles->ReadBool(elem, field);
 
-
-	strcpy(elem, "Keys");
-
 	strcpy(field, "ToggleWallHack");
 	Config::Key::ToggleWH = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "ToggleNoFlash");
@@ -446,12 +443,8 @@ int main()
 	strcpy(field, "EnableTriggerBot");
 	Config::Key::Trigger = g_pFiles->ReadInt(elem, field);
 
-	strcpy(elem, "TriggerBot");
-
 	strcpy(field, "Delay");
 	Config::TriggerDelay = g_pFiles->ReadInt(elem, field);
-
-	strcpy(elem, "NoFlash");
 
 	strcpy(field, "FlashPercentage");
 	Config::FlashPercentage = g_pFiles->ReadInt(elem, field);
