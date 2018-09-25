@@ -12,10 +12,58 @@
 
 CMemoryManager* MemoryManager;
 
+float RandomFloat(float min, float max)
+{
+	float random = ((float)rand()) / (float)RAND_MAX;
+
+	float range = max - min;
+	return (random*range) + min;
+}
+
 struct Vector
 {
 	float x, y, z;
+	Vector();
+	Vector(float _X, float _Y, float _Z);
+	Vector operator- (const Vector &A);
+	Vector operator+ (const Vector &A);
+	Vector operator* (const float A);
+	Vector operator/ (const float A);
 };
+
+Vector::Vector()
+{
+	this->x = 0.0f;
+	this->y = 0.0f;
+	this->z = 0.0f;
+}
+
+Vector::Vector(float _X, float _Y, float _Z)
+{
+	this->x = _X;
+	this->y = _Y;
+	this->z = _Z;
+}
+
+Vector Vector::operator* (const float A)
+{
+	return Vector(this->x * A, this->y * A, this->z * A);
+}
+
+Vector Vector::operator/ (const float A)
+{
+	return Vector(this->x / A, this->y / A, this->z / A);
+}
+
+Vector Vector::operator- (const Vector &A)
+{
+	return Vector(this->x - A.x, this->y - A.y, this->z - A.z);
+}
+
+Vector Vector::operator+ (const Vector &A)
+{
+	return Vector(this->x + A.x, this->y + A.y, this->z + A.z);
+}
 
 class NoFlash {
 private:
@@ -209,8 +257,19 @@ public:
 	void Start() {
 		this->isRunning = true;
 
+		DWORD m_iShotsFired = 0xA2C0;
+		DWORD m_aimPunchAngle = 0x301C;
+		DWORD dwClientState_ViewAngles = 0x4D10;
+		DWORD dwClientState = 0x588A74;
+
+		Vector punchAngles;
+		Vector viewAngles;
+		Vector NewAngles;
+
 		while (this->isRunning) {
 			if (this->isBhop) {
+				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+
 				if (GetAsyncKeyState(Config::Key::Bhop) & 0x8000)
 				{
 					MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
@@ -305,7 +364,77 @@ public:
 	}
 };
 
+class RCS {
+private:
+	bool isRunning;
+
+	Vector punchAngles;
+	Vector viewAngles;
+	Vector NewAngles;
+public:
+	bool isRCS;
+
+	RCS(bool isRCS = false) {
+		this->isRCS = isRCS;
+	}
+
+	void Start() {
+		this->isRunning = true;
+
+		bool wasShoot = false;
+
+		while (this->isRunning) {
+			if (this->isRCS) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(15));
+
+				DWORD player = 0;
+				MemoryManager->Read<DWORD>(Offsets::bEngine + Offsets::dwClientState, player);
+
+				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+
+				int shotsFired = 0;
+				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::m_iShotsFired, shotsFired);
+
+				MemoryManager->Read<Vector>(Offsets::LocalBase + Offsets::m_aimPunchAngle, punchAngles);
+
+				if (shotsFired < 2)
+				{
+					if (wasShoot) {
+						wasShoot = !wasShoot;
+						MemoryManager->Write(player + Offsets::dwViewAngles, viewAngles);//Sets new Viewangles
+					}
+
+					MemoryManager->Read<Vector>(player + Offsets::dwViewAngles, viewAngles);//Gets Viewangles
+				}
+				else
+				{
+					if (punchAngles.x == 0.0f && punchAngles.y == 0.0f)//So it doesnt lock xhair when using grenades/knife/c4.
+						continue;
+
+					NewAngles = viewAngles;
+					NewAngles.x -= punchAngles.x * float(Config::RcsVerticalSmooth / 100.f * 2.f + RandomFloat(-0.1f, 0.1f));
+					NewAngles.y -= punchAngles.y * float(Config::RcsHorizontalSmooth / 100.f * 2.f + RandomFloat(-0.1f, 0.1f));
+					NewAngles.z = 0.f;
+
+					MemoryManager->Write(player + Offsets::dwViewAngles, NewAngles);//Sets new Viewangles
+
+					wasShoot = true;
+				}
+			}
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+		}
+	}
+
+	void Stop() {
+		this->isRunning = false;
+	}
+};
+
 ESP Esp;
+RCS Rcs;
 BHOP Bhop;
 NoFlash Noflash;
 TriggerBot Triggerbot;
@@ -427,6 +556,8 @@ int main()
 	Config::RadarDefault = g_pFiles->ReadBool(elem, field);
 	strcpy(field, "BHOP");
 	Config::BHopDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "RCS");
+	Config::RCSDefault = g_pFiles->ReadBool(elem, field);
 
 	strcpy(field, "ToggleWallHack");
 	Config::Key::ToggleWH = g_pFiles->ReadInt(elem, field);
@@ -438,6 +569,8 @@ int main()
 	Config::Key::ToggleRadar = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "ToggleBHOP");
 	Config::Key::ToggleBHop = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleRCS");
+	Config::Key::ToggleRCS = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "Exit");
 	Config::Key::Exit = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "EnableTriggerBot");
@@ -448,6 +581,11 @@ int main()
 
 	strcpy(field, "FlashPercentage");
 	Config::FlashPercentage = g_pFiles->ReadInt(elem, field);
+
+	strcpy(field, "RcsVerticalSmoothPercentage");
+	Config::RcsVerticalSmooth = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "RcsHorizontalSmoothPercentage");
+	Config::RcsHorizontalSmooth = g_pFiles->ReadInt(elem, field);
 
 	std::string hwid;
 
@@ -607,11 +745,13 @@ int main()
 	Beep(1000, 200);
 
 	Esp = ESP(Config::WHDefault, Config::RadarDefault);
+	Rcs = RCS(Config::RCSDefault);
 	Bhop = BHOP(Config::BHopDefault);
 	Noflash = NoFlash(Config::NoFlashDefault);
 	Triggerbot = TriggerBot(Config::TriggerDefault);
 
 	std::thread tEsp(&ESP::Start, &Esp);
+	std::thread tRcs(&RCS::Start, &Rcs);
 	std::thread tBhop(&BHOP::Start, &Bhop);
 	std::thread tNoFlash(&NoFlash::Start, &Noflash);
 	std::thread tTriggerBot(&TriggerBot::Start, &Triggerbot);
@@ -624,11 +764,13 @@ int main()
 			Beep(500, 200);
 
 			Esp.Stop();
+			Rcs.Stop();
 			Bhop.Stop();
 			Noflash.Stop();
 			Triggerbot.Stop();
 
 			tEsp.join();
+			tRcs.join();
 			tBhop.join();
 			tNoFlash.join();
 			tTriggerBot.join();
@@ -685,6 +827,17 @@ int main()
 			Esp.isWallHack = !Esp.isWallHack;
 
 			if (Esp.isWallHack)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleRCS) & 0x8000)
+		{
+			Rcs.isRCS = !Rcs.isRCS;
+
+			if (Rcs.isRCS)
 				Beep(1000, 200);
 			else
 				Beep(500, 200);

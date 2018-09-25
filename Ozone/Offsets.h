@@ -24,4 +24,9 @@ public:
 	static DWORD iCrosshairId;				// m_iCrosshairId
 
 	static DWORD flFlashMaxAlpha;			// m_flFlashMaxAlpha
+
+	static DWORD m_iShotsFired;				// m_iShotsFired
+	static DWORD m_aimPunchAngle;			// m_aimPunchAngle
+	static DWORD dwViewAngles;				// dwClientState_ViewAngles
+	static DWORD dwClientState;				// dwClientState
 };

@@ -24,3 +24,8 @@ DWORD Offsets::bSpottedMask = 0x97C;		// m_bSpottedByMask
 DWORD Offsets::iCrosshairId = 0xB2B8;		// m_iCrosshairId
 
 DWORD Offsets::flFlashMaxAlpha = 0xA304;	// m_flFlashMaxAlpha
+
+DWORD Offsets::m_iShotsFired = 0xA2C0;		// m_iShotsFired
+DWORD Offsets::m_aimPunchAngle = 0x301C;	// m_aimPunchAngle
+DWORD Offsets::dwViewAngles = 0x4D10;		// dwClientState_ViewAngles
+DWORD Offsets::dwClientState = 0x588A74;	// dwClientState

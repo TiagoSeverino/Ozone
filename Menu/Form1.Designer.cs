@@ -36,6 +36,7 @@
             this.btnBHOP = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnMic = new System.Windows.Forms.Button();
+            this.btnRCS = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnWH
@@ -90,7 +91,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(498, 12);
+            this.btnSave.Location = new System.Drawing.Point(579, 12);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 75);
             this.btnSave.TabIndex = 5;
@@ -100,7 +101,7 @@
             // 
             // btnMic
             // 
-            this.btnMic.Location = new System.Drawing.Point(417, 12);
+            this.btnMic.Location = new System.Drawing.Point(498, 12);
             this.btnMic.Name = "btnMic";
             this.btnMic.Size = new System.Drawing.Size(75, 75);
             this.btnMic.TabIndex = 6;
@@ -108,11 +109,22 @@
             this.btnMic.UseVisualStyleBackColor = true;
             this.btnMic.Click += new System.EventHandler(this.btnMic_Click);
             // 
+            // btnRCS
+            // 
+            this.btnRCS.Location = new System.Drawing.Point(417, 12);
+            this.btnRCS.Name = "btnRCS";
+            this.btnRCS.Size = new System.Drawing.Size(75, 75);
+            this.btnRCS.TabIndex = 7;
+            this.btnRCS.Text = "No Recoil";
+            this.btnRCS.UseVisualStyleBackColor = true;
+            this.btnRCS.Click += new System.EventHandler(this.btnRCS_Click);
+            // 
             // fMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(589, 97);
+            this.ClientSize = new System.Drawing.Size(665, 97);
+            this.Controls.Add(this.btnRCS);
             this.Controls.Add(this.btnMic);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnBHOP);
@@ -140,6 +152,7 @@
         private System.Windows.Forms.Button btnBHOP;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnMic;
+        private System.Windows.Forms.Button btnRCS;
     }
 }
 

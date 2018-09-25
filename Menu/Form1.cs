@@ -71,5 +71,11 @@ namespace Menu
             fMisc f = new fMisc();
             f.ShowDialog();
         }
+
+        private void btnRCS_Click(object sender, EventArgs e)
+        {
+            fRCS f = new fRCS();
+            f.ShowDialog();
+        }
     }
 }

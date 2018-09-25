@@ -80,6 +80,12 @@
     <Compile Include="fRadar.Designer.cs">
       <DependentUpon>fRadar.cs</DependentUpon>
     </Compile>
+    <Compile Include="fRCS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fRCS.Designer.cs">
+      <DependentUpon>fRCS.cs</DependentUpon>
+    </Compile>
     <Compile Include="fTrigger.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -108,6 +114,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="fRadar.resx">
       <DependentUpon>fRadar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="fRCS.resx">
+      <DependentUpon>fRCS.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="fTrigger.resx">
       <DependentUpon>fTrigger.cs</DependentUpon>
