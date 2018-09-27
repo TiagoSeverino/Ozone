@@ -1,5 +1,5 @@
 #include "stdafx.h"
-std::string Config::Version = "0.3";
+std::string Config::Version = "0.4";
 
 int Config::Key::Exit = VK_DELETE;
 int Config::Key::Bhop = VK_SPACE;
