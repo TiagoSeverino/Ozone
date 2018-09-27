@@ -758,7 +758,7 @@ int main()
 
 	while (true)
 	{
-		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000)
+		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000 || !FindWindow(NULL, "Counter-Strike: Global Offensive"))
 		{
 			std::cout << "Hasta la vista, baby!" << std::endl;
 			Beep(500, 200);
