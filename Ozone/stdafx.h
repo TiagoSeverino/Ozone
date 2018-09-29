@@ -12,6 +12,8 @@
 #include <sstream> //Supports Data Conversion
 #include <vector>
 
+#include <d3dx9.h>
+
 #include <stdio.h>
 #include <tchar.h>
 

@@ -65,6 +65,65 @@ Vector Vector::operator+ (const Vector &A)
 	return Vector(this->x + A.x, this->y + A.y, this->z + A.z);
 }
 
+static bool ScreenTransform(const D3DXVECTOR3& point, D3DXVECTOR3& screen)
+{
+	D3DXMATRIX w2sMatrix1;
+
+	MemoryManager->Read<D3DXMATRIX>(Offsets::bClient + Offsets::dwViewMatrix, w2sMatrix1);
+
+	const D3DXMATRIX& w2sMatrix = w2sMatrix1;
+
+	screen.x = w2sMatrix.m[0][0] * point.x + w2sMatrix.m[0][1] * point.y + w2sMatrix.m[0][2] * point.z + w2sMatrix.m[0][3];
+	screen.y = w2sMatrix.m[1][0] * point.x + w2sMatrix.m[1][1] * point.y + w2sMatrix.m[1][2] * point.z + w2sMatrix.m[1][3];
+	screen.z = 0.0f;
+
+	float w = w2sMatrix.m[3][0] * point.x + w2sMatrix.m[3][1] * point.y + w2sMatrix.m[3][2] * point.z + w2sMatrix.m[3][3];
+
+	if (w < 0.001f) {
+		screen.x *= 100000;
+		screen.y *= 100000;
+		return true;
+	}
+
+	float invw = 1.0f / w;
+	screen.x *= invw;
+	screen.y *= invw;
+
+	return false;
+}
+
+static bool WorldToScreen(const D3DXVECTOR3 &origin, D3DXVECTOR3 &screen, int w, int h)
+{
+	if (!ScreenTransform(origin, screen)) {
+		screen.x = (w / 2.0f) + (screen.x * w) / 2;
+		screen.y = (h / 2.0f) - (screen.y * h) / 2;
+
+		return true;
+	}
+	return false;
+}
+
+static bool CheckWindowFocus() {
+	char text[128];
+	if (!GetWindowText(GetForegroundWindow(), text, 256) > 0 && strcmp(text, "Counter-Strike: Global Offensive"))
+		return false;
+
+	return true;
+}
+
+static float GetSens() {
+	DWORD dwSensitivityPtr = 0xC640B8;
+	DWORD dwSensitivity = 0xC640E4;
+
+	DWORD thisPtr = (int)(Offsets::bClient + dwSensitivityPtr);
+	DWORD sensitivity;
+	MemoryManager->Read<DWORD>(Offsets::bClient + dwSensitivity, sensitivity);
+
+	sensitivity ^= thisPtr;
+
+	return *reinterpret_cast<float*>(&sensitivity);
+}
+
 class NoFlash {
 private:
 	bool isRunning;
@@ -433,11 +492,155 @@ public:
 	}
 };
 
+class AimBot {
+private:
+	bool isRunning;
+public:
+	bool isAimbot;
+
+	AimBot(bool isAimbot = false) {
+		this->isAimbot = isAimbot;
+	}
+
+	void Start() {
+		this->isRunning = true;
+
+		while (this->isRunning) {
+			if (isAimbot){
+
+				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
+
+				int shotsFired;
+				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::m_iShotsFired, shotsFired);
+
+				if ((GetKeyState(VK_LBUTTON) & 0x80) == 0 && shotsFired == 0)
+					continue;
+
+				aimbot(getPlayer());
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+	}
+
+	DWORD getPlayer() {
+		D3DXVECTOR3 w2sHead;
+
+		DWORD plrToAim = NULL;
+		double lowestDist = 5000;
+
+		for (int i = 1; i < 64; i++) {
+			DWORD player;
+			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (i * 0x10), player);
+
+			if (player == 0)
+				continue;
+
+			DWORD myTeam = 0;
+			MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
+
+			bool dormant = false;
+			MemoryManager->Read<bool>(player + Offsets::oDormant, dormant);
+
+			if (dormant)
+				continue;
+
+			bool spotted = false;
+			MemoryManager->Read<bool>(player + Offsets::bSpotted, spotted);
+
+			if (!spotted)
+				continue;
+
+			int health = 0;
+			MemoryManager->Read<int>(player + Offsets::iHealth, health);
+
+			if (health == 0)
+				continue;
+
+			DWORD team = 0;
+			MemoryManager->Read<DWORD>(player + Offsets::iTeam, team);
+
+			if (team != 2 && team != 3 || team == myTeam)
+				continue;
+
+			D3DXVECTOR3 bones = getEntBonePos(player, Config::AimbotBone);
+
+			WorldToScreen(bones, w2sHead, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+
+			double dist = sqrt(pow((GetSystemMetrics(SM_CXSCREEN) / 2) - w2sHead.x, 2) + pow((GetSystemMetrics(SM_CYSCREEN) / 2) - w2sHead.y, 2));
+
+			if (dist < lowestDist && WorldToScreen(bones, w2sHead, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)))
+			{
+				lowestDist = dist;
+				plrToAim = player;
+			}
+		}
+
+		return plrToAim;
+	}
+
+	void aimbot(DWORD playerToAimAt) {
+		if (!CheckWindowFocus())
+			return;
+
+		if (playerToAimAt == NULL)
+			return;
+
+		D3DXVECTOR3 w2sHead;
+
+		D3DXVECTOR3 bones = getEntBonePos(playerToAimAt, Config::AimbotBone);
+		WorldToScreen(bones, w2sHead, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+
+		float headX = (w2sHead.x - (GetSystemMetrics(SM_CXSCREEN) / 2));
+		float headY = (w2sHead.y - (GetSystemMetrics(SM_CYSCREEN) / 2));
+
+		DWORD user;
+		MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList, user);
+		D3DXVECTOR3 userBones = getEntBonePos(user, Config::AimbotBone);
+
+		float distance = sqrt(pow(userBones.x - bones.x, 2) + pow(userBones.y - bones.y, 2) + pow(userBones.z - bones.z, 2));
+		float fov = Config::AimbotFOV * (500 / distance);
+
+		float enemyFOV = sqrt(pow(headX, 2) + pow(headY, 2));
+
+		if (enemyFOV < fov) {
+			float sens = GetSens();
+			float smooth = float(5.f / Config::AimbotSmooth + RandomFloat(-0.1f, 0.1f));
+			mouse_event(MOUSEEVENTF_MOVE, (DWORD)(headX / sens * smooth), (DWORD)(headY / sens * smooth), NULL, NULL);
+		}
+
+	}
+
+	typedef struct {
+		float Matrix[3][4];
+	} Matrix3x4_t;
+
+	D3DXVECTOR3	getEntBonePos(DWORD playerBase, int boneID)
+	{
+
+		DWORD bone;
+		MemoryManager->Read<DWORD>(playerBase + Offsets::m_dwBoneMatrix, bone);
+
+		Matrix3x4_t boneMatrix;
+		MemoryManager->Read<Matrix3x4_t>(bone + boneID * 0x30, boneMatrix);
+
+		return{
+			boneMatrix.Matrix[0][3],
+			boneMatrix.Matrix[1][3],
+			boneMatrix.Matrix[2][3]
+		};
+	}
+
+	void Stop() {
+		this->isRunning = false;
+	}
+};
+
 ESP Esp;
 RCS Rcs;
 BHOP Bhop;
 NoFlash Noflash;
 TriggerBot Triggerbot;
+AimBot Aimbot;
 
 bool WebRequest(std::string url, std::string location, std::string &website_HTML) {
 	WSADATA wsaData;
@@ -560,6 +763,8 @@ int main()
 	Config::BHopDefault = g_pFiles->ReadBool(elem, field);
 	strcpy(field, "RCS");
 	Config::RCSDefault = g_pFiles->ReadBool(elem, field);
+	strcpy(field, "Aimbot");
+	Config::AimbotDefault = g_pFiles->ReadBool(elem, field);
 
 	strcpy(field, "ToggleWallHack");
 	Config::Key::ToggleWH = g_pFiles->ReadInt(elem, field);
@@ -573,6 +778,8 @@ int main()
 	Config::Key::ToggleBHop = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "ToggleRCS");
 	Config::Key::ToggleRCS = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "ToggleAimbot");
+	Config::Key::ToggleAimbot = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "Exit");
 	Config::Key::Exit = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "EnableTriggerBot");
@@ -588,6 +795,14 @@ int main()
 	Config::RcsVerticalSmooth = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "RcsHorizontalSmoothPercentage");
 	Config::RcsHorizontalSmooth = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "RcsHorizontalSmoothPercentage");
+	Config::RcsHorizontalSmooth = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "AimbotFOV");
+	Config::AimbotFOV = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "AimbotSmooth");
+	Config::AimbotSmooth = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "AimbotBone");
+	Config::AimbotBone = g_pFiles->ReadInt(elem, field);
 
 	std::string hwid;
 
@@ -800,12 +1015,15 @@ int main()
 	Bhop = BHOP(Config::BHopDefault);
 	Noflash = NoFlash(Config::NoFlashDefault);
 	Triggerbot = TriggerBot(Config::TriggerDefault);
+	Aimbot = AimBot(Config::AimbotDefault);
+
 
 	std::thread tEsp(&ESP::Start, &Esp);
 	std::thread tRcs(&RCS::Start, &Rcs);
 	std::thread tBhop(&BHOP::Start, &Bhop);
 	std::thread tNoFlash(&NoFlash::Start, &Noflash);
 	std::thread tTriggerBot(&TriggerBot::Start, &Triggerbot);
+	std::thread tAimBot(&AimBot::Start, &Aimbot);
 
 	while (true)
 	{
@@ -819,12 +1037,14 @@ int main()
 			Bhop.Stop();
 			Noflash.Stop();
 			Triggerbot.Stop();
+			Aimbot.Stop();
 
 			tEsp.join();
 			tRcs.join();
 			tBhop.join();
 			tNoFlash.join();
 			tTriggerBot.join();
+			tAimBot.join();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			break;
@@ -889,6 +1109,17 @@ int main()
 			Rcs.isRCS = !Rcs.isRCS;
 
 			if (Rcs.isRCS)
+				Beep(1000, 200);
+			else
+				Beep(500, 200);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		if (GetAsyncKeyState(Config::Key::ToggleAimbot) & 0x8000)
+		{
+			Aimbot.isAimbot = !Aimbot.isAimbot;
+
+			if (Aimbot.isAimbot)
 				Beep(1000, 200);
 			else
 				Beep(500, 200);

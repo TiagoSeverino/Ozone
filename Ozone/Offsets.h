@@ -29,4 +29,6 @@ public:
 	static DWORD m_aimPunchAngle;			// m_aimPunchAngle
 	static DWORD dwViewAngles;				// dwClientState_ViewAngles
 	static DWORD dwClientState;				// dwClientState
+	static DWORD dwViewMatrix;				// dwViewMatrix
+	static DWORD m_dwBoneMatrix;			// m_dwBoneMatrix
 };

@@ -28,4 +28,7 @@ DWORD Offsets::flFlashMaxAlpha = 0xA304;	// m_flFlashMaxAlpha
 DWORD Offsets::m_iShotsFired = 0xA2C0;		// m_iShotsFired
 DWORD Offsets::m_aimPunchAngle = 0x301C;	// m_aimPunchAngle
 DWORD Offsets::dwViewAngles = 0x4D10;		// dwClientState_ViewAngles
-DWORD Offsets::dwClientState = 0x588A74;	// dwClientState
+DWORD Offsets::dwClientState = 0x588A74;	// dwClientState 
+DWORD Offsets::dwViewMatrix = 0x4C2CDB4;	// dwViewMatrix
+
+DWORD Offsets::m_dwBoneMatrix = 0x2698;		//m_dwBoneMatrix

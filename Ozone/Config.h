@@ -13,6 +13,7 @@ public:
 		static int ToggleRadar;
 		static int ToggleBHop;
 		static int ToggleRCS;
+		static int ToggleAimbot;
 	};
 
 	static bool WHDefault;
@@ -21,9 +22,13 @@ public:
 	static bool RadarDefault;
 	static bool BHopDefault;
 	static bool RCSDefault;
+	static bool AimbotDefault;
 
 	static int TriggerDelay;
 	static int FlashPercentage;
 	static int RcsVerticalSmooth;
 	static int RcsHorizontalSmooth;
+	static int AimbotFOV;
+	static int AimbotSmooth;
+	static int AimbotBone;
 };
