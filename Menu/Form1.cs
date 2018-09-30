@@ -77,5 +77,11 @@ namespace Menu
             fRCS f = new fRCS();
             f.ShowDialog();
         }
+
+        private void btnAimbot_Click(object sender, EventArgs e)
+        {
+            fAimBot f = new fAimBot();
+            f.ShowDialog();
+        }
     }
 }

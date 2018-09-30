@@ -18,6 +18,7 @@ namespace Menu
         public static int ToggleRadar = (int)Keys.F7;
         public static int ToggleBHop = (int)Keys.F8;
         public static int ToggleRCS = (int)Keys.F9;
+        public static int ToggleAimbot = (int)Keys.F10;
 
         public static bool WHDefault = true;
         public static bool NoFlashDefault = true;
@@ -25,11 +26,15 @@ namespace Menu
         public static bool RadarDefault = true;
         public static bool BHopDefault = true;
         public static bool RCSDefault = true;
+        public static bool AimBotDefault = true;
 
         public static int TriggerDelay = 0;
         public static int FlashPercentage = 50;
         public static int RcsVerticalSmooth = 50;
         public static int RcsHorizontalSmooth = 50;
+        public static int AimbotFOV = 50;
+        public static int AimbotSmooth = 50;
+        public static int AimbotBone = 8;
 
         public static void ArrayToConfig(string[] config)
         {
@@ -58,6 +63,9 @@ namespace Menu
                         case "RCS":
                             Config.RCSDefault = (param[1] == "true");
                             break;
+                        case "Aimbot":
+                            Config.AimBotDefault = (param[1] == "true");
+                            break;
                         case "ToggleWallHack":
                             Config.ToggleWH = int.Parse(param[1]);
                             break;
@@ -75,6 +83,9 @@ namespace Menu
                             break;
                         case "ToggleRCS":
                             Config.ToggleRCS = int.Parse(param[1]);
+                            break;
+                        case "ToggleAimbot":
+                            Config.ToggleAimbot = int.Parse(param[1]);
                             break;
                         case "Exit":
                             Config.Exit = int.Parse(param[1]);
@@ -94,6 +105,15 @@ namespace Menu
                         case "RcsHorizontalSmoothPercentage":
                             Config.RcsHorizontalSmooth = int.Parse(param[1]);
                             break;
+                        case "AimbotFOV":
+                            Config.AimbotFOV = int.Parse(param[1]);
+                            break;
+                        case "AimbotSmooth":
+                            Config.AimbotSmooth = int.Parse(param[1]);
+                            break;
+                        case "AimbotBone":
+                            Config.AimbotBone = int.Parse(param[1]);
+                            break;
                     }
             }
         }
@@ -108,6 +128,7 @@ namespace Menu
             config.Add("RadarHack" + "=" + (RadarDefault ? "true" : "false"));
             config.Add("BHOP" + "=" + (BHopDefault ? "true" : "false"));
             config.Add("RCS" + "=" + (RCSDefault ? "true" : "false"));
+            config.Add("Aimbot" + "=" + (AimBotDefault ? "true" : "false"));
 
             config.Add("ToggleWallHack" + "=" + ToggleWH.ToString());
             config.Add("ToggleNoFlash" + "=" + ToggleNoFlash.ToString());
@@ -115,6 +136,7 @@ namespace Menu
             config.Add("ToggleRadarHack" + "=" + ToggleRadar.ToString());
             config.Add("ToggleBHOP" + "=" + ToggleBHop.ToString());
             config.Add("ToggleRCS" + "=" + ToggleRCS.ToString());
+            config.Add("ToggleAimbot" + "=" + ToggleAimbot.ToString());
             config.Add("Exit" + "=" + Exit.ToString());
             config.Add("EnableTriggerBot" + "=" + Trigger.ToString());
 
@@ -124,6 +146,10 @@ namespace Menu
 
             config.Add("RcsVerticalSmoothPercentage" + "=" + RcsVerticalSmooth.ToString());
             config.Add("RcsHorizontalSmoothPercentage" + "=" + RcsHorizontalSmooth.ToString());
+
+            config.Add("AimbotFOV" + "=" + AimbotFOV.ToString());
+            config.Add("AimbotSmooth" + "=" + AimbotSmooth.ToString());
+            config.Add("AimbotBone" + "=" + AimbotBone.ToString());
 
             return config.ToArray();
         }

@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="fAimBot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fAimBot.Designer.cs">
+      <DependentUpon>fAimBot.cs</DependentUpon>
+    </Compile>
     <Compile Include="fBHOP.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,6 +106,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="fAimBot.resx">
+      <DependentUpon>fAimBot.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="fBHOP.resx">
       <DependentUpon>fBHOP.cs</DependentUpon>
     </EmbeddedResource>

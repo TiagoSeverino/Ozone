@@ -37,6 +37,7 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.btnMic = new System.Windows.Forms.Button();
             this.btnRCS = new System.Windows.Forms.Button();
+            this.btnAimbot = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnWH
@@ -61,7 +62,7 @@
             // 
             // btnTrigger
             // 
-            this.btnTrigger.Location = new System.Drawing.Point(336, 12);
+            this.btnTrigger.Location = new System.Drawing.Point(93, 93);
             this.btnTrigger.Name = "btnTrigger";
             this.btnTrigger.Size = new System.Drawing.Size(75, 75);
             this.btnTrigger.TabIndex = 2;
@@ -71,7 +72,7 @@
             // 
             // btnNoFlash
             // 
-            this.btnNoFlash.Location = new System.Drawing.Point(255, 12);
+            this.btnNoFlash.Location = new System.Drawing.Point(12, 93);
             this.btnNoFlash.Name = "btnNoFlash";
             this.btnNoFlash.Size = new System.Drawing.Size(75, 75);
             this.btnNoFlash.TabIndex = 3;
@@ -91,7 +92,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(579, 12);
+            this.btnSave.Location = new System.Drawing.Point(174, 174);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 75);
             this.btnSave.TabIndex = 5;
@@ -101,7 +102,7 @@
             // 
             // btnMic
             // 
-            this.btnMic.Location = new System.Drawing.Point(498, 12);
+            this.btnMic.Location = new System.Drawing.Point(93, 174);
             this.btnMic.Name = "btnMic";
             this.btnMic.Size = new System.Drawing.Size(75, 75);
             this.btnMic.TabIndex = 6;
@@ -111,7 +112,7 @@
             // 
             // btnRCS
             // 
-            this.btnRCS.Location = new System.Drawing.Point(417, 12);
+            this.btnRCS.Location = new System.Drawing.Point(174, 93);
             this.btnRCS.Name = "btnRCS";
             this.btnRCS.Size = new System.Drawing.Size(75, 75);
             this.btnRCS.TabIndex = 7;
@@ -119,11 +120,22 @@
             this.btnRCS.UseVisualStyleBackColor = true;
             this.btnRCS.Click += new System.EventHandler(this.btnRCS_Click);
             // 
+            // btnAimbot
+            // 
+            this.btnAimbot.Location = new System.Drawing.Point(12, 174);
+            this.btnAimbot.Name = "btnAimbot";
+            this.btnAimbot.Size = new System.Drawing.Size(75, 75);
+            this.btnAimbot.TabIndex = 8;
+            this.btnAimbot.Text = "Aimbot";
+            this.btnAimbot.UseVisualStyleBackColor = true;
+            this.btnAimbot.Click += new System.EventHandler(this.btnAimbot_Click);
+            // 
             // fMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(665, 97);
+            this.ClientSize = new System.Drawing.Size(261, 258);
+            this.Controls.Add(this.btnAimbot);
             this.Controls.Add(this.btnRCS);
             this.Controls.Add(this.btnMic);
             this.Controls.Add(this.btnSave);
@@ -137,7 +149,7 @@
             this.MaximizeBox = false;
             this.Name = "fMenu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "D0minator.xyz | Menu";
+            this.Text = "D0minator.xyz";
             this.Load += new System.EventHandler(this.fMenu_Load);
             this.ResumeLayout(false);
 
@@ -153,6 +165,7 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnMic;
         private System.Windows.Forms.Button btnRCS;
+        private System.Windows.Forms.Button btnAimbot;
     }
 }
 
