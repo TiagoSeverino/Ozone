@@ -24,10 +24,10 @@ namespace Menu
             for(int i = 0; i < 255; i++)
                 cbKey.Items.Add(Convert.ToString((Keys) i));
 
-            ckDefault.Checked = Config.RCSDefault;
-            cbKey.SelectedIndex = Config.ToggleRCS;
-            tbSmooth.Value = Config.RcsHorizontalSmooth;
-            tbFOV.Value = Config.RcsVerticalSmooth;
+            ckDefault.Checked = Config.AimBotDefault;
+            cbKey.SelectedIndex = Config.ToggleAimbot;
+            tbSmooth.Value = Config.AimbotSmooth;
+            tbFOV.Value = Config.AimbotFOV;
 
             rbBody.Checked = Config.AimbotBone == 5;
             rbHead.Checked = Config.AimbotBone == 8;
