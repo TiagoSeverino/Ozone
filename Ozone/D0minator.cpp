@@ -105,7 +105,7 @@ static bool WorldToScreen(const D3DXVECTOR3 &origin, D3DXVECTOR3 &screen, int w,
 
 static bool CheckWindowFocus() {
 	char text[128];
-	if (!GetWindowText(GetForegroundWindow(), text, 256) > 0 && strcmp(text, "Counter-Strike: Global Offensive"))
+	if (!GetWindowText(GetForegroundWindow(), text, 256) > 0 || strcmp(text, "Counter-Strike: Global Offensive"))
 		return false;
 
 	return true;
@@ -514,7 +514,13 @@ public:
 				int shotsFired;
 				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::m_iShotsFired, shotsFired);
 
-				if ((GetKeyState(VK_LBUTTON) & 0x80) == 0 && shotsFired == 0)
+				int health;
+				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iHealth, health);
+
+				if ((GetKeyState(VK_LBUTTON) & 0x80) == 0 && shotsFired == 0 || health == 0)
+					continue;
+
+				if (!CheckWindowFocus())
 					continue;
 
 				aimbot(getPlayer());
@@ -583,9 +589,6 @@ public:
 	}
 
 	void aimbot(DWORD playerToAimAt) {
-		if (!CheckWindowFocus())
-			return;
-
 		if (playerToAimAt == NULL)
 			return;
 
