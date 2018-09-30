@@ -748,6 +748,9 @@ int main()
 {
 	volatile bool notActivated = true;
 
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
+
 	system("cls");
 	std::string title = "D0minator.xyz Version - " + Config::Version;
 
