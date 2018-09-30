@@ -27,3 +27,4 @@ int Config::RcsHorizontalSmooth = 50;
 int Config::AimbotFOV = 50;
 int Config::AimbotSmooth = 50;
 int Config::AimbotBone = 8;
+bool Config::AimbotMagnet = true;

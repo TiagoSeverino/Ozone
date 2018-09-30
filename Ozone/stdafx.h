@@ -21,3 +21,4 @@
 #include "Offsets.h"
 #include "Config.h"
 #include "Files.h"
+#include "XOR.h"

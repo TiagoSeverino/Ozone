@@ -3,9 +3,9 @@
 
 //#define Test_Mod
 #ifndef Test_Mod
-	#define _api_url "api.d0minator.xyz"
+	#define _api_url XOR("api.d0minator.xyz")
 #else
-	#define _api_url "localhost"
+	#define _api_url XOR("localhost")
 #endif // Test_Mod
 
 #define api_url std::string(_api_url)
@@ -105,7 +105,7 @@ static bool WorldToScreen(const D3DXVECTOR3 &origin, D3DXVECTOR3 &screen, int w,
 
 static bool CheckWindowFocus() {
 	char text[128];
-	if (!GetWindowText(GetForegroundWindow(), text, 256) > 0 || strcmp(text, "Counter-Strike: Global Offensive"))
+	if (!GetWindowText(GetForegroundWindow(), text, 256) > 0 || strcmp(text, XOR("Counter-Strike: Global Offensive")))
 		return false;
 
 	return true;
@@ -517,7 +517,7 @@ public:
 				int health;
 				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iHealth, health);
 
-				if ((GetKeyState(VK_LBUTTON) & 0x80) == 0 && shotsFired == 0 || health == 0)
+				if (((GetKeyState(VK_LBUTTON) & 0x80) == 0 || shotsFired == 0 && health == 0) && (!(GetKeyState(Config::Key::Trigger) & 0x80) && Config::AimbotMagnet ))
 					continue;
 
 				if (!CheckWindowFocus())
@@ -666,8 +666,8 @@ bool WebRequest(std::string url, std::string location, std::string &website_HTML
 
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-		std::cout << "WSAStartup failed.\n";
-		system("pause");
+		std::cout << XOR("WSAStartup failed.\n");
+		system(XOR("pause"));
 		return false;
 	}
 
@@ -679,8 +679,8 @@ bool WebRequest(std::string url, std::string location, std::string &website_HTML
 	SockAddr.sin_addr.s_addr = *((unsigned long*)host->h_addr);
 
 	if (connect(Socket, (SOCKADDR*)(&SockAddr), sizeof(SockAddr)) != 0) {
-		std::cout << "Could not connect to server\n";
-		system("pause");
+		std::cout << XOR("Could not connect to server\n");
+		system(XOR("pause"));
 		return false;
 	}
 
@@ -752,13 +752,13 @@ int main()
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
 
 	system("cls");
-	std::string title = "D0minator.xyz Version - " + Config::Version;
+	std::string title = XOR("D0minator.xyz Version - ") + Config::Version;
 
 	SetConsoleTitle(_T(title.c_str()));
 
-	g_pFiles->OnSetup("config.cfg", "C:\\D0minator\\");
+	g_pFiles->OnSetup(XOR("config.cfg"), XOR("C:\\D0minator\\"));
 
-	char elem[] = "Features";
+	char elem[] = XOR("Features");
 
 	bool b = true;
 	char field[] = "WallHack";
@@ -813,12 +813,14 @@ int main()
 	Config::AimbotSmooth = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "AimbotBone");
 	Config::AimbotBone = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "AimbotMagnet");
+	Config::AimbotMagnet = g_pFiles->ReadBool(elem, field);
 
 	std::string hwid;
 
 	if (!getHWID(hwid)) {
-		std::cout << "Error reading serial" << std::endl;
-		system("pause");
+		std::cout << XOR("Error reading serial") << std::endl;
+		system(XOR("pause"));
 		return 0;
 	}
 
@@ -827,9 +829,9 @@ int main()
 
 	std::string response;
 
-	printf("Connecting to server\n");
+	printf(XOR("Connecting to server\n"));
 	if (!WebRequest(api_url, ("api/" + std::to_string(str_hash)), response)) {
-		std::cout << "Error connecting to server" << std::endl;
+		std::cout << XOR("Error connecting to server") << std::endl;
 		system("pause");
 		return 0;
 	}
@@ -855,47 +857,47 @@ int main()
 	std::string sMinutesLeft;
 
 	for (std::string &result : results) {
-		if (result.find("Code:") != -1)
+		if (result.find(XOR("Code:")) != -1)
 			sCode = result.substr(6, result.length());
 
-		if (result.find("Status:") != -1)
+		if (result.find(XOR("Status:")) != -1)
 			sStatus = result.substr(8, result.length());
 
-		if (result.find("Version:") != -1)
+		if (result.find(XOR("Version:")) != -1)
 			sVersion = result.substr(9, result.length());
 
-		if (result.find("DaysLeft:") != -1)
+		if (result.find(XOR("DaysLeft:")) != -1)
 			sDaysLeft = result.substr(10, result.length());
 
-		if (result.find("HoursLeft:") != -1)
+		if (result.find(XOR("HoursLeft:")) != -1)
 			sHoursLeft = result.substr(11, result.length());
 
-		if (result.find("MinutesLeft:") != -1)
+		if (result.find(XOR("MinutesLeft:")) != -1)
 			sMinutesLeft = result.substr(13, result.length());
 	}
 
 	if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0 && !sHoursLeft.length() > 0 && !sMinutesLeft.length() > 0) {
-		printf("Error connecting to server");
-		system("pause");
+		printf(XOR("Error connecting to server"));
+		system(XOR("pause"));
 		return 0;
 	}
 	
 	system("cls");
 
 	if (strcmp(sVersion.c_str(), Config::Version.c_str())) {
-		printf("I'm an obsolete design.\nNew D0minator.xyz is faster, more powerful and more intelligent. It's a far more effective killing machine\n");
-		system("pause");
+		printf(XOR("I'm an obsolete design.\nNew D0minator.xyz is faster, more powerful and more intelligent. It's a far more effective killing machine\n"));
+		system(XOR("pause"));
 		return 0;
 	}
 
-	if (strcmp(sStatus.c_str(), "Activated")) {
-		printf("Insert your serial key: ");
+	if (strcmp(sStatus.c_str(), XOR("Activated"))) {
+		printf(XOR("Insert your serial key: "));
 
 		std::string line;
 		std::getline(std::cin, line);
 
 		response.clear();
-		WebRequest(api_url, ("api/" + sCode + "/" + line), response);
+		WebRequest(api_url, (XOR("api/") + sCode + "/" + line), response);
 
 		response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
 
@@ -914,11 +916,11 @@ int main()
 		std::string res;
 
 		for (std::string &result : results) 
-			if (result.find("Res:") != -1)
+			if (result.find(XOR("Res:")) != -1)
 				res = result.substr(5, result.length());
 
-		printf("%s\n", res.c_str());
-		system("pause");
+		printf(XOR("%s\n", res.c_str()));
+		system(XOR("pause"));
 
 
 		char myPath[_MAX_PATH + 1];
@@ -929,18 +931,18 @@ int main()
 	}
 	else
 	{
-		if (!strcmp(sStatus.c_str(), "Activated") && notActivated) {
+		if (!strcmp(sStatus.c_str(), XOR("Activated")) && notActivated) {
 			notActivated = false;
 		}
 		else
 		{
-			printf("Insert your serial key: ");
+			printf(XOR("Insert your serial key: "));
 
 			std::string line;
 			std::getline(std::cin, line);
 
 			response.clear();
-			WebRequest(api_url, ("api/" + sCode + "/" + line), response);
+			WebRequest(api_url, (XOR("api/") + sCode + "/" + line), response);
 
 			response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
 
@@ -974,32 +976,32 @@ int main()
 		}
 	}
 
-	printf("Welcome to D0minator.xyz! You have %s days, %s hours and %s minutes left!\n", sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
+	printf(XOR("Welcome to D0minator.xyz! You have %s days, %s hours and %s minutes left!\n"), sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
 
-	std::cout << "Waiting for CS:GO!" << std::endl;
+	std::cout << XOR("Waiting for CS:GO!") << std::endl;
 
-	while (!FindWindow(NULL, "Counter-Strike: Global Offensive"))
+	while (!FindWindow(NULL, XOR("Counter-Strike: Global Offensive")))
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 	}
 
 	try {
-		MemoryManager = new CMemoryManager("csgo.exe");
+		MemoryManager = new CMemoryManager(XOR("csgo.exe"));
 	}
 	catch (...) {
-		std::cout << "CS:GO not found!" << std::endl;
+		std::cout << XOR("CS:GO not found!" << std::endl);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		return 0;
 	}
 
-	std::cout << "CS:GO Found!" << std::endl;
+	std::cout << XOR("CS:GO Found!") << std::endl;
 
-	while (!MemoryManager->GrabModule("client_panorama.dll") || !MemoryManager->GrabModule("engine.dll"))
+	while (!MemoryManager->GrabModule(XOR("client_panorama.dll")) || !MemoryManager->GrabModule(XOR("engine.dll")))
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
 	for (auto m : MemoryManager->GetModules())
 	{
-		if (!strcmp(m.szModule, "client_panorama.dll"))
+		if (!strcmp(m.szModule, XOR("client_panorama.dll")))
 		{
 			Offsets::bClient = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
@@ -1008,15 +1010,15 @@ int main()
 
 	for (auto m : MemoryManager->GetModules())
 	{
-		if (!strcmp(m.szModule, "engine.dll"))
+		if (!strcmp(m.szModule, XOR("engine.dll")))
 		{
 			Offsets::bEngine = reinterpret_cast<DWORD>(m.modBaseAddr);
 			break;
 		}
 	}
 
-	printf("D0minator.xyz started!\n");
-	printf("Come with me if you want to live\n");
+	printf(XOR("D0minator.xyz started!\n"));
+	printf(XOR("Come with me if you want to live\n"));
 
 	Beep(1000, 200);
 
@@ -1037,9 +1039,9 @@ int main()
 
 	while (true)
 	{
-		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000 || !FindWindow(NULL, "Counter-Strike: Global Offensive") || strcmp(sStatus.c_str(), "Activated") || notActivated)
+		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000 || !FindWindow(NULL, XOR("Counter-Strike: Global Offensive")) || strcmp(sStatus.c_str(), XOR("Activated")) || notActivated)
 		{
-			std::cout << "Hasta la vista, baby!" << std::endl;
+			std::cout << XOR("Hasta la vista, baby!") << std::endl;
 			Beep(500, 200);
 
 			Esp.Stop();

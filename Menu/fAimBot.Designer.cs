@@ -39,6 +39,7 @@
             this.rbHead = new System.Windows.Forms.RadioButton();
             this.rbBody = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
+            this.ckMagnet = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.tbSmooth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbFOV)).BeginInit();
             this.SuspendLayout();
@@ -144,11 +145,23 @@
             this.label2.TabIndex = 9;
             this.label2.Text = "Aim to:";
             // 
+            // ckMagnet
+            // 
+            this.ckMagnet.AutoSize = true;
+            this.ckMagnet.Location = new System.Drawing.Point(120, 12);
+            this.ckMagnet.Name = "ckMagnet";
+            this.ckMagnet.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.ckMagnet.Size = new System.Drawing.Size(82, 17);
+            this.ckMagnet.TabIndex = 10;
+            this.ckMagnet.Text = "Magnet Aim";
+            this.ckMagnet.UseVisualStyleBackColor = true;
+            // 
             // fAimBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(216, 180);
+            this.Controls.Add(this.ckMagnet);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.rbBody);
             this.Controls.Add(this.rbHead);
@@ -186,5 +199,6 @@
         private System.Windows.Forms.RadioButton rbHead;
         private System.Windows.Forms.RadioButton rbBody;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox ckMagnet;
     }
 }

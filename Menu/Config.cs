@@ -35,6 +35,7 @@ namespace Menu
         public static int AimbotFOV = 50;
         public static int AimbotSmooth = 50;
         public static int AimbotBone = 8;
+        public static bool AimbotMagnet = true;
 
         public static void ArrayToConfig(string[] config)
         {
@@ -114,6 +115,9 @@ namespace Menu
                         case "AimbotBone":
                             Config.AimbotBone = int.Parse(param[1]);
                             break;
+                        case "AimbotMagnet":
+                            Config.AimbotMagnet = (param[1] == "true");
+                            break;
                     }
             }
         }
@@ -150,6 +154,7 @@ namespace Menu
             config.Add("AimbotFOV" + "=" + AimbotFOV.ToString());
             config.Add("AimbotSmooth" + "=" + AimbotSmooth.ToString());
             config.Add("AimbotBone" + "=" + AimbotBone.ToString());
+            config.Add("AimbotMagnet" + "=" + (AimbotMagnet ? "true" : "false"));
 
             return config.ToArray();
         }

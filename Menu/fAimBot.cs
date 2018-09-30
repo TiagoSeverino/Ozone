@@ -28,6 +28,7 @@ namespace Menu
             cbKey.SelectedIndex = Config.ToggleAimbot;
             tbSmooth.Value = Config.AimbotSmooth;
             tbFOV.Value = Config.AimbotFOV;
+            ckMagnet.Checked = Config.AimbotMagnet;
 
             rbBody.Checked = Config.AimbotBone == 5;
             rbHead.Checked = Config.AimbotBone == 8;
@@ -42,6 +43,7 @@ namespace Menu
             Config.ToggleAimbot = cbKey.SelectedIndex;
             Config.AimbotSmooth = tbSmooth.Value;
             Config.AimbotFOV = tbFOV.Value;
+            Config.AimbotMagnet = ckMagnet.Checked;
             Config.AimbotBone = rbHead.Checked ? 8 : 5;
     }
 

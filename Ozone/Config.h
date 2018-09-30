@@ -31,4 +31,5 @@ public:
 	static int AimbotFOV;
 	static int AimbotSmooth;
 	static int AimbotBone;
+	static bool AimbotMagnet;
 };
