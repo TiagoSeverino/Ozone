@@ -507,6 +507,7 @@ public:
 
 		while (this->isRunning) {
 			if (isAimbot){
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 				MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::LocalPlayer, Offsets::LocalBase);
 
@@ -517,7 +518,10 @@ public:
 					continue;
 
 				aimbot(getPlayer());
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+			else
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
 		}
 	}
