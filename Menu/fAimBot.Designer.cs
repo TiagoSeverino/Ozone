@@ -77,11 +77,13 @@
             this.tbSmooth.LargeChange = 20;
             this.tbSmooth.Location = new System.Drawing.Point(112, 93);
             this.tbSmooth.Maximum = 100;
+            this.tbSmooth.Minimum = 1;
             this.tbSmooth.Name = "tbSmooth";
             this.tbSmooth.Size = new System.Drawing.Size(92, 45);
             this.tbSmooth.SmallChange = 10;
             this.tbSmooth.TabIndex = 1;
             this.tbSmooth.TickFrequency = 25;
+            this.tbSmooth.Value = 1;
             this.tbSmooth.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // lbSmooth
