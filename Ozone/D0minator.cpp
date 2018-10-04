@@ -112,12 +112,11 @@ static bool CheckWindowFocus() {
 }
 
 static float GetSens() {
-	DWORD dwSensitivityPtr = 0xC640B8;
-	DWORD dwSensitivity = 0xC640E4;
+	
 
-	DWORD thisPtr = (int)(Offsets::bClient + dwSensitivityPtr);
+	DWORD thisPtr = (int)(Offsets::bClient + Offsets::dwSensitivityPtr);
 	DWORD sensitivity;
-	MemoryManager->Read<DWORD>(Offsets::bClient + dwSensitivity, sensitivity);
+	MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::dwSensitivity, sensitivity);
 
 	sensitivity ^= thisPtr;
 

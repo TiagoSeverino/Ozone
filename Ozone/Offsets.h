@@ -31,4 +31,7 @@ public:
 	static DWORD dwClientState;				// dwClientState
 	static DWORD dwViewMatrix;				// dwViewMatrix
 	static DWORD m_dwBoneMatrix;			// m_dwBoneMatrix
+
+	static DWORD dwSensitivityPtr;			// dwSensitivityPtr = 0xC640B8;
+	static DWORD dwSensitivity;				// dwSensitivity = 0xC640E4;
 };
