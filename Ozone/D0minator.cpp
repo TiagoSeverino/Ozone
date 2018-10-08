@@ -809,8 +809,6 @@ VOID startup(LPCTSTR lpApplicationName)
 
 int main()
 {
-	volatile bool notActivated = true;
-
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
 
@@ -961,84 +959,13 @@ int main()
 		std::string line;
 		std::getline(std::cin, line);
 
-		response.clear();
 		WebRequest(api_url, (XOR("api/") + sCode + "/" + line), response);
-
-		response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
-
-		notActivated = true;
-
-		results.clear();
-
-		last_split = 0;
-		for (int i = 0; i < response.length(); i++) {
-			if (response[i] == '\n') {
-				results.push_back(response.substr(last_split, i - last_split));
-				last_split = i + 1;
-			}
-		}
-
-		std::string res;
-
-		for (std::string &result : results) 
-			if (result.find(XOR("Res:")) != -1)
-				res = result.substr(5, result.length());
-
-		printf(XOR("%s\n", res.c_str()));
-		system(XOR("pause"));
-
 
 		char myPath[_MAX_PATH + 1];
 		GetModuleFileName(NULL, myPath, _MAX_PATH);
 
 		startup(myPath);
 		return 0;
-	}
-	else
-	{
-		if (!strcmp(sStatus.c_str(), XOR("Activated")) && notActivated) {
-			notActivated = false;
-		}
-		else
-		{
-			printf(XOR("Insert your serial key: "));
-
-			std::string line;
-			std::getline(std::cin, line);
-
-			response.clear();
-			WebRequest(api_url, (XOR("api/") + sCode + "/" + line), response);
-
-			response.erase(std::remove(response.begin(), response.end(), '\r'), response.end());
-
-			notActivated = true;
-
-			results.clear();
-
-			last_split = 0;
-			for (int i = 0; i < response.length(); i++) {
-				if (response[i] == '\n') {
-					results.push_back(response.substr(last_split, i - last_split));
-					last_split = i + 1;
-				}
-			}
-
-			std::string res;
-
-			for (std::string &result : results)
-				if (result.find("Res:") != -1)
-					res = result.substr(5, result.length());
-
-			printf("%s\n", res.c_str());
-			system("pause");
-
-
-			char myPath[_MAX_PATH + 1];
-			GetModuleFileName(NULL, myPath, _MAX_PATH);
-
-			startup(myPath);
-			return 0;
-		}
 	}
 
 	printf(XOR("Welcome to D0minator.xyz! You have %s days, %s hours and %s minutes left!\n"), sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
@@ -1104,7 +1031,7 @@ int main()
 
 	while (true)
 	{
-		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000 || !FindWindow(NULL, XOR("Counter-Strike: Global Offensive")) || strcmp(sStatus.c_str(), XOR("Activated")) || notActivated)
+		if (GetAsyncKeyState(Config::Key::Exit) & 0x8000 || !FindWindow(NULL, XOR("Counter-Strike: Global Offensive")) || strcmp(sStatus.c_str(), XOR("Activated")))
 		{
 			std::cout << XOR("Hasta la vista, baby!") << std::endl;
 			Beep(500, 200);
