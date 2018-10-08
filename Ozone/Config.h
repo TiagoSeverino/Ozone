@@ -7,6 +7,7 @@ public:
 		static int Exit;
 		static int Bhop;
 		static int Trigger;
+		static int RankReveal;
 		static int ToggleWH;
 		static int ToggleNoFlash;
 		static int ToggleTrigger;

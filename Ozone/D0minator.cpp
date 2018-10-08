@@ -641,6 +641,70 @@ public:
 	}
 };
 
+class RankRevealer {
+public:
+	static void ShowRanks() {
+
+		const char *Ranks[] = {
+			XOR("Unranked"),
+			XOR("Silver I"),
+			XOR("Silver II"),
+			XOR("Silver III"),
+			XOR("Silver IV"),
+			XOR("Silver Elite"),
+			XOR("Silver Elite Master"),
+			XOR("Gold Nova I"),
+			XOR("Gold Nova II"),
+			XOR("Gold Nova III"),
+			XOR("Gold Nova Master"),
+			XOR("Master Guardian I"),
+			XOR("Master Guardian II"),
+			XOR("Master Guardian Elite"),
+			XOR("Distinguished Master Guardian"),
+			XOR("Legendary Eagle"),
+			XOR("Legendary Eagle Master"),
+			XOR("Supreme Master First Class"),
+			XOR("The Global Elite")
+		};
+
+		for (int i = 0; i < 64; i++) {
+			DWORD player;
+			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (i * 0x10), player);
+
+			if (player == 0)
+				continue;
+
+			printf("#%i : ", i);
+			printf("0x%llx -> ", player);
+
+
+			DWORD Radar;
+			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::dwRadarBase, Radar);
+
+			DWORD RadarBase;
+			MemoryManager->Read<DWORD>((Radar + 0x108) + 0x1E4, RadarBase);
+
+			DWORD EntityBase;
+			MemoryManager->Read<DWORD>(RadarBase + (0x370 * i), EntityBase);
+
+			wchar_t name[32];
+			MemoryManager->Read<wchar_t[32]>(EntityBase + 0x16C, name);
+			printf("%ls -> ", name);
+
+			uint64_t  PlayerResource;
+			MemoryManager->Read<uint64_t>(Offsets::bClient + Offsets::dwPlayerResource, PlayerResource);
+
+			int rank;
+			MemoryManager->Read<int>(PlayerResource + Offsets::iCompetitiveRanking + (0x4 * i), rank);
+			printf("%s -> ", Ranks[rank]);
+
+			int wins;
+			MemoryManager->Read<int>(PlayerResource + Offsets::iCompetitiveWins + (0x4 * i), wins);
+			printf("%i\n", wins);
+		}
+	}
+};
+
 ESP Esp;
 RCS Rcs;
 BHOP Bhop;
@@ -793,6 +857,8 @@ int main()
 	Config::Key::Exit = g_pFiles->ReadInt(elem, field);
 	strcpy(field, "EnableTriggerBot");
 	Config::Key::Trigger = g_pFiles->ReadInt(elem, field);
+	strcpy(field, "RankReveal");
+	Config::Key::RankReveal = g_pFiles->ReadInt(elem, field);
 
 	strcpy(field, "Delay");
 	Config::TriggerDelay = g_pFiles->ReadInt(elem, field);
@@ -1059,6 +1125,12 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			break;
+		}
+		if (GetAsyncKeyState(Config::Key::RankReveal) & 0x8000)
+		{
+			Beep(1000, 200);
+			RankRevealer::ShowRanks();
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
 		if (GetAsyncKeyState(Config::Key::ToggleBHop) & 0x8000)
 		{

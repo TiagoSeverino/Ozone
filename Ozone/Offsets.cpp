@@ -35,3 +35,8 @@ DWORD Offsets::m_dwBoneMatrix = 0x2698;		//m_dwBoneMatrix
 
 DWORD Offsets::dwSensitivityPtr = 0xC650D8;	// dwSensitivityPtr
 DWORD Offsets::dwSensitivity = 0xC65104;	// dwSensitivity
+
+DWORD Offsets::dwRadarBase = 0x507113C;		// dwRadarBase
+DWORD Offsets::dwPlayerResource = 0x307BECC;// dwPlayerResource 
+DWORD Offsets::iCompetitiveRanking = 0x1A84;// m_iCompetitiveRanking
+DWORD Offsets::iCompetitiveWins = 0x1B88;	// iCompetitiveWins

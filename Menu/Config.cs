@@ -19,6 +19,7 @@ namespace Menu
         public static int ToggleBHop = (int)Keys.F8;
         public static int ToggleRCS = (int)Keys.F9;
         public static int ToggleAimbot = (int)Keys.F10;
+        public static int RankReveal = (int)Keys.F11;
 
         public static bool WHDefault = true;
         public static bool NoFlashDefault = true;
@@ -94,6 +95,9 @@ namespace Menu
                         case "EnableTriggerBot":
                             Config.Trigger = int.Parse(param[1]);
                             break;
+                        case "RankReveal":
+                            Config.RankReveal = int.Parse(param[1]);
+                            break;
                         case "Delay":
                             Config.TriggerDelay = int.Parse(param[1]);
                             break;
@@ -143,6 +147,7 @@ namespace Menu
             config.Add("ToggleAimbot" + "=" + ToggleAimbot.ToString());
             config.Add("Exit" + "=" + Exit.ToString());
             config.Add("EnableTriggerBot" + "=" + Trigger.ToString());
+            config.Add("RankReveal" + "=" + RankReveal.ToString());
 
             config.Add("Delay" + "=" + TriggerDelay.ToString());
 

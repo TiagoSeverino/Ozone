@@ -21,15 +21,19 @@ namespace Menu
 
         private void fMisc_Load(object sender, EventArgs e)
         {
-            for(int i = 0; i < 255; i++)
-                cbKey.Items.Add(Convert.ToString((Keys) i));
+            for(int i = 0; i < 255; i++){
+                cbRankReveal.Items.Add(Convert.ToString((Keys) i));
+                cbExitKey.Items.Add(Convert.ToString((Keys)i));
+            }
 
-            cbKey.SelectedIndex = Config.Exit;
+            cbExitKey.SelectedIndex = Config.Exit;
+            cbRankReveal.SelectedIndex = Config.RankReveal;
         }
 
         private void fMisc_FormClosing(object sender, EventArgs e)
         {
-            Config.Exit = cbKey.SelectedIndex;
+            Config.Exit = cbExitKey.SelectedIndex;
+            Config.RankReveal = cbRankReveal.SelectedIndex;
         }
     }
 }

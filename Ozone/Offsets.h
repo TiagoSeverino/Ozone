@@ -32,6 +32,11 @@ public:
 	static DWORD dwViewMatrix;				// dwViewMatrix
 	static DWORD m_dwBoneMatrix;			// m_dwBoneMatrix
 
-	static DWORD dwSensitivityPtr;			// dwSensitivityPtr = 0xC640B8;
-	static DWORD dwSensitivity;				// dwSensitivity = 0xC640E4;
+	static DWORD dwSensitivityPtr;			// dwSensitivityPtr
+	static DWORD dwSensitivity;				// dwSensitivity
+
+	static DWORD dwRadarBase;				// dwRadarBase
+	static DWORD dwPlayerResource;			// dwPlayerResource
+	static DWORD iCompetitiveRanking;		// m_iCompetitiveRanking
+	static DWORD iCompetitiveWins;			// m_iCompetitiveWins
 };

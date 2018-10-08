@@ -11,6 +11,7 @@ int Config::Key::ToggleRadar = VK_F7;
 int Config::Key::ToggleBHop = VK_F8;
 int Config::Key::ToggleRCS = VK_F9;
 int Config::Key::ToggleAimbot = VK_F10;
+int Config::Key::RankReveal = VK_F11;
 
 bool Config::WHDefault = true;
 bool Config::NoFlashDefault = true;
