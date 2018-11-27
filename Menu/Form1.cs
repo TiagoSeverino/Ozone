@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Menu
 {
@@ -33,7 +34,22 @@ namespace Menu
         {
             File.Delete(path);
             File.WriteAllLines(path, Config.ConfigToArray());
-            Environment.Exit(0);
+
+            try
+            {
+                Process[] pname = Process.GetProcessesByName("D0minator");
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = pname[0].MainModule.FileName;
+
+                pname[0].Kill();
+                pname[0].WaitForExit();
+
+                Process.Start(startInfo);
+                return;
+            }catch(Exception ex)
+            {
+                Environment.Exit(0);
+            }
         }
 
         private void btnWH_Click(object sender, EventArgs e)
