@@ -89,6 +89,9 @@ namespace Updater
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (!Directory.Exists(@"C:\D0minator\"))
+                Directory.CreateDirectory(@"C:\D0minator\");
+
             File.AppendAllText(key, "");
             textBox1.Text = File.ReadAllText(key);
         }
