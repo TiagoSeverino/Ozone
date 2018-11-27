@@ -347,8 +347,7 @@ public:
 					BYTE fFlags = 0;
 					MemoryManager->Read<BYTE>(Offsets::LocalBase + Offsets::oFlags, fFlags);
 
-					if (fFlags & (1 << 0)) // Check for FL_ONGROUND
-						MemoryManager->Write(Offsets::bClient + Offsets::forceJump, 6); // Will force jump for 1 tick only
+					MemoryManager->Write(Offsets::bClient + Offsets::forceJump, (fFlags & (1 << 0)) ? 5 : 4); // Check for FL_ONGROUND and Will force jump
 				}
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
