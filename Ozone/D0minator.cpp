@@ -315,11 +315,6 @@ public:
 	void Start() {
 		this->isRunning = true;
 
-		DWORD m_iShotsFired = 0xA2C0;
-		DWORD m_aimPunchAngle = 0x301C;
-		DWORD dwClientState_ViewAngles = 0x4D10;
-		DWORD dwClientState = 0x588A74;
-
 		Vector punchAngles;
 		Vector viewAngles;
 		Vector NewAngles;
