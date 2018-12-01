@@ -153,7 +153,7 @@ public:
 			if (FlashAlpha != flashAlpha)
 				MemoryManager->Write(Offsets::LocalBase + Offsets::flFlashMaxAlpha, flashAlpha);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
 	}
 
@@ -293,7 +293,7 @@ public:
 		this->isRunning = true;
 		while (this->isRunning) {
 			ScanPlayers();
-			std::this_thread::sleep_for(std::chrono::milliseconds(16));
+			std::this_thread::sleep_for(std::chrono::milliseconds(8));
 		}
 	}
 
@@ -807,7 +807,7 @@ int main()
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
 
 	system("cls");
-	std::string title = XOR("D0minator.xyz Version - ") + Config::Version;
+	std::string title = XOR("D0minator.xyz ") + Config::Version;
 
 	SetConsoleTitle(_T(title.c_str()));
 
@@ -912,6 +912,7 @@ int main()
 	std::string sDaysLeft;
 	std::string sHoursLeft;
 	std::string sMinutesLeft;
+	std::string sPack;
 
 	for (std::string &result : results) {
 		if (result.find(XOR("Code:")) != -1)
@@ -931,9 +932,12 @@ int main()
 
 		if (result.find(XOR("MinutesLeft:")) != -1)
 			sMinutesLeft = result.substr(13, result.length());
+		
+		if (result.find(XOR("Pack:")) != -1)
+			sPack = result.substr(6, result.length());
 	}
 
-	if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0 && !sHoursLeft.length() > 0 && !sMinutesLeft.length() > 0) {
+		if (!sCode.length() > 0 || !sStatus.length() > 0 && !sVersion.length() > 0 && !sDaysLeft.length() > 0 && !sHoursLeft.length() > 0 && !sMinutesLeft.length() > 0 && !sPack.length() > 0) {
 		printf(XOR("Error connecting to server"));
 		system(XOR("pause"));
 		return 0;
@@ -962,7 +966,16 @@ int main()
 		return 0;
 	}
 
-	printf(XOR("Welcome to D0minator.xyz! You have %s days, %s hours and %s minutes left!\n"), sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
+	const char *Packs[] = {
+		XOR("Invalid"),
+		XOR("Basic"),
+		XOR("Professional"),
+		XOR("Ultimate"),
+	};
+
+	int pack = std::stoi(sPack, nullptr, 8);
+
+	printf(XOR("Welcome to D0minator.xyz %s Edition! You have %s days, %s hours and %s minutes left!\n"), Packs[pack], sDaysLeft.c_str(), sHoursLeft.c_str(), sMinutesLeft.c_str());
 
 	std::cout << XOR("Waiting for CS:GO!") << std::endl;
 
@@ -1008,13 +1021,21 @@ int main()
 
 	Beep(1000, 200);
 
-	Esp = ESP(Config::WHDefault, Config::RadarDefault);
-	Rcs = RCS(Config::RCSDefault);
-	Bhop = BHOP(Config::BHopDefault);
-	Noflash = NoFlash(Config::NoFlashDefault);
-	Triggerbot = TriggerBot(Config::TriggerDefault);
-	Aimbot = AimBot(Config::AimbotDefault);
-
+	switch (pack)
+	{
+		case 3:
+			Noflash = NoFlash(Config::NoFlashDefault);
+			Rcs = RCS(Config::RCSDefault);
+		case 2:
+			Aimbot = AimBot(Config::AimbotDefault);
+			Esp = ESP(Config::WHDefault, Config::RadarDefault);
+		case 1:
+			Bhop = BHOP(Config::BHopDefault);
+			Triggerbot = TriggerBot(Config::TriggerDefault);
+			break;
+		default:
+			break;
+	}
 
 	std::thread tEsp(&ESP::Start, &Esp);
 	std::thread tRcs(&RCS::Start, &Rcs);
@@ -1047,13 +1068,13 @@ int main()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			break;
 		}
-		if (GetAsyncKeyState(Config::Key::RankReveal) & 0x8000)
+		if (pack >= 3 && GetAsyncKeyState(Config::Key::RankReveal) & 0x8000)
 		{
 			Beep(1000, 200);
 			RankRevealer::ShowRanks();
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleBHop) & 0x8000)
+		if (pack >= 1 && GetAsyncKeyState(Config::Key::ToggleBHop) & 0x8000)
 		{
 			Bhop.isBhop = !Bhop.isBhop;
 
@@ -1064,7 +1085,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleNoFlash) & 0x8000)
+		if (pack >= 3 && GetAsyncKeyState(Config::Key::ToggleNoFlash) & 0x8000)
 		{
 			Noflash.isNoFlash = !Noflash.isNoFlash;
 
@@ -1075,7 +1096,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleRadar) & 0x8000)
+		if (pack >= 2 && GetAsyncKeyState(Config::Key::ToggleRadar) & 0x8000)
 		{
 			Esp.isRadarHack = !Esp.isRadarHack;
 
@@ -1086,7 +1107,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleTrigger) & 0x8000)
+		if (pack >= 1 && GetAsyncKeyState(Config::Key::ToggleTrigger) & 0x8000)
 		{
 			Triggerbot.isTriggerBot = !Triggerbot.isTriggerBot;
 			
@@ -1097,7 +1118,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleWH) & 0x8000)
+		if (pack >= 2 && GetAsyncKeyState(Config::Key::ToggleWH) & 0x8000)
 		{
 			Esp.isWallHack = !Esp.isWallHack;
 
@@ -1108,7 +1129,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleRCS) & 0x8000)
+		if (pack >= 3 && GetAsyncKeyState(Config::Key::ToggleRCS) & 0x8000)
 		{
 			Rcs.isRCS = !Rcs.isRCS;
 
@@ -1119,7 +1140,7 @@ int main()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		if (GetAsyncKeyState(Config::Key::ToggleAimbot) & 0x8000)
+		if (pack >= 2 && GetAsyncKeyState(Config::Key::ToggleAimbot) & 0x8000)
 		{
 			Aimbot.isAimbot = !Aimbot.isAimbot;
 
