@@ -11,7 +11,6 @@ public:
 	static DWORD bSpotted;					// m_bSpotted
 	static DWORD EntityList;				// dwEntityList
 	static DWORD iTeam;						// m_iTeamNum
-	static DWORD oDormant;
 	static DWORD iHealth;					// m_iHealth
 	static DWORD bIsDefusing;				// m_bIsDefusing
 	static DWORD mMoveType;					// m_MoveType
@@ -39,4 +38,7 @@ public:
 	static DWORD dwPlayerResource;			// dwPlayerResource
 	static DWORD iCompetitiveRanking;		// m_iCompetitiveRanking
 	static DWORD iCompetitiveWins;			// m_iCompetitiveWins
+
+	static DWORD dwGameRulesProxy;			// dwGameRulesProxy
+	static DWORD m_SurvivalGameRuleDecisionTypes;
 };

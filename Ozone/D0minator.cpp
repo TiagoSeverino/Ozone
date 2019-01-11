@@ -123,6 +123,17 @@ static float GetSens() {
 	return *reinterpret_cast<float*>(&sensitivity);
 }
 
+static bool IsDangerMode() {
+	bool bIsDangerMode = false;
+	DWORD GameRules = 0;
+	DWORD SurvivalDecisionTypes = 0;
+
+	MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::dwGameRulesProxy, GameRules);
+	MemoryManager->Read<DWORD>(GameRules + Offsets::m_SurvivalGameRuleDecisionTypes, SurvivalDecisionTypes);
+
+	return SurvivalDecisionTypes != 0;
+}
+
 class NoFlash {
 private:
 	bool isRunning;
@@ -209,6 +220,7 @@ private:
 		DWORD myTeam = 0;
 		MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
+		bool danger = IsDangerMode();
 		for (int i = 0; i <= 64; ++i)
 		{
 			DWORD player = 0;
@@ -223,12 +235,6 @@ private:
 			if (player == 0)
 				continue;
 
-			bool dormant = false;
-			MemoryManager->Read<bool>(player + Offsets::oDormant, dormant);
-
-			if (dormant)
-				continue;
-
 			DWORD team = 0;
 			MemoryManager->Read<DWORD>(player + Offsets::iTeam, team);
 
@@ -236,7 +242,7 @@ private:
 				continue;
 
 			if (this->isWallHack) {
-				if (team == myTeam) {
+				if (team == myTeam && !danger) {
 					GlowPlayer(player, CTeammate);
 					continue;
 				}
@@ -252,7 +258,7 @@ private:
 				{
 					GlowPlayer(player, CBlue);
 				}
-				else if (health <= 100 && health > 75)
+				else if (health > 75)
 				{
 					GlowPlayer(player, CGreen);
 				}
@@ -380,9 +386,11 @@ public:
 					int cross = 0;
 					MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iCrosshairId, cross);
 
+					DWORD myTeam = 0;
+					MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
+
 					if (cross > 0 && cross <= 64) {
-						DWORD myTeam = 0;
-						MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
+						bool danger = IsDangerMode();
 
 						DWORD playerInCross = 0;
 						MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (cross - 1) * 0x10, playerInCross);
@@ -390,10 +398,7 @@ public:
 						DWORD teamInCross = 0;
 						MemoryManager->Read<DWORD>(playerInCross + Offsets::iTeam, teamInCross);
 
-						bool dormant = false;
-						MemoryManager->Read<bool>(playerInCross + Offsets::oDormant, dormant);
-
-						if (teamInCross != myTeam && !dormant) { // if enemy
+						if (teamInCross != myTeam || danger) { // if enemy
 							std::this_thread::sleep_for(std::chrono::milliseconds(Config::TriggerDelay));
 							MemoryManager->Write(Offsets::bClient + Offsets::forceAttack, 1); //Force Shoot
 							std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -510,7 +515,7 @@ public:
 				int health;
 				MemoryManager->Read<int>(Offsets::LocalBase + Offsets::iHealth, health);
 
-				if (((GetKeyState(VK_LBUTTON) & 0x80) == 0 || shotsFired == 0 && health == 0) && (!(GetKeyState(Config::Key::Trigger) & 0x80) && Config::AimbotMagnet ))
+				if ((((GetKeyState(VK_LBUTTON) & 0x80) == 0 || shotsFired == 0) && (!(GetKeyState(Config::Key::Trigger) & 0x80) && Config::AimbotMagnet )) || health == 0)
 					continue;
 
 				if (!CheckWindowFocus())
@@ -531,6 +536,8 @@ public:
 		DWORD plrToAim = NULL;
 		double lowestDist = 5000;
 
+		bool danger = IsDangerMode();
+
 		for (int i = 1; i < 64; i++) {
 			DWORD player;
 			MemoryManager->Read<DWORD>(Offsets::bClient + Offsets::EntityList + (i * 0x10), player);
@@ -541,12 +548,6 @@ public:
 			DWORD myTeam = 0;
 			MemoryManager->Read<DWORD>(Offsets::LocalBase + Offsets::iTeam, myTeam);
 
-			bool dormant = false;
-			MemoryManager->Read<bool>(player + Offsets::oDormant, dormant);
-
-			if (dormant)
-				continue;
-
 			bool spotted = false;
 			MemoryManager->Read<bool>(player + Offsets::bSpotted, spotted);
 
@@ -556,13 +557,13 @@ public:
 			int health = 0;
 			MemoryManager->Read<int>(player + Offsets::iHealth, health);
 
-			if (health == 0)
+			if (health <= 0 || health > 125)
 				continue;
 
 			DWORD team = 0;
 			MemoryManager->Read<DWORD>(player + Offsets::iTeam, team);
 
-			if (team != 2 && team != 3 || team == myTeam)
+			if (team != 2 && team != 3 || (team == myTeam && !danger))
 				continue;
 
 			D3DXVECTOR3 bones = getEntBonePos(player, Config::AimbotBone);
